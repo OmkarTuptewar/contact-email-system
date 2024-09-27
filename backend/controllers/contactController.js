@@ -44,3 +44,42 @@ exports.getContactsByYearAndSeason = async (req, res) => {
     res.status(500).json({ message: 'Error fetching contacts', error });
   }
 };
+
+exports.updateContacts = async (req, res) => {
+  const { year, season, oldLabel, newLabel, contacts } = req.body; // oldLabel and newLabel for possible label change
+
+  try {
+    // Find the contact entry by year, season, and old label
+    const contactEntry = await Contact.findOne({ year, season, label: oldLabel });
+
+    if (!contactEntry) {
+      return res.status(404).json({ message: 'Contact entry not found for the specified year, season, and label' });
+    }
+
+    // Update the label and contacts if they are changed
+    contactEntry.label = newLabel || oldLabel; // Update only if the label has changed
+    contactEntry.contacts = contacts; // Update the contacts list
+
+    // Save the updated contact entry
+    const updatedEntry = await contactEntry.save();
+
+    res.status(200).json({
+      message: 'Contact entry updated successfully',
+      updatedContact: updatedEntry,
+    });
+  } catch (error) {
+    console.error('Error updating contacts:', error);
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+
+
+  exports.getUniqueYears = async (req, res) => {
+    try {
+      const years = await Contact.distinct('season'); // Assuming 'year' is the field in your contacts
+      res.status(200).json(years);
+    } catch (error) {
+      console.error('Error fetching years:', error);
+      res.status(500).json({ message: 'Error fetching years' });
+    }
+  };

@@ -46,6 +46,12 @@ const AddYearButton = ({ onSelectYear, onSelectSeason }) => {
         </div>
       )}
     </div>
+
+
+   
+
+
+
   );
 };
 
