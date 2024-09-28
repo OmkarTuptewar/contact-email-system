@@ -56,9 +56,20 @@ exports.updateContacts = async (req, res) => {
       return res.status(404).json({ message: 'Contact entry not found for the specified year, season, and label' });
     }
 
-    // Update the label and contacts if they are changed
-    contactEntry.label = newLabel || oldLabel; // Update only if the label has changed
-    contactEntry.contacts = contacts; // Update the contacts list
+    // Check if newLabel is provided and not empty, then update the label
+    if (newLabel && newLabel.trim() !== "") {
+      contactEntry.label = newLabel;
+    }
+
+    // Check if contacts is provided and not empty, then update the contacts
+    if (contacts && contacts.length > 0) {
+      contactEntry.contacts = contacts;
+    }
+
+    // If both fields are empty, return an error indicating no update was made
+    if (!newLabel && (!contacts || contacts.length === 0)) {
+      return res.status(400).json({ message: 'No updates were provided' });
+    }
 
     // Save the updated contact entry
     const updatedEntry = await contactEntry.save();
@@ -72,6 +83,7 @@ exports.updateContacts = async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
+
 
 
   exports.getUniqueYears = async (req, res) => {

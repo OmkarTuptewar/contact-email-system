@@ -72,7 +72,7 @@ const App = () => {
       <div className="grid grid-cols-12 gap-2 p-2 h-screen bg-black">
         
         {/* First Column - Years Section */}
-        <div className="col-span-2 bg-white border rounded-lg shadow-md p-6">
+        <div className="col-span-2 bg-white border rounded-lg shadow-md p-6 ">
           <h2 className="font-bold text-lg mb-4">Years</h2>
           <AddYearButton onSelectYear={setSelectedYear} onSelectSeason={setSelectedSeason} />
           <YearList selectedYear={selectedYear} selectedSeason={selectedSeason} />
@@ -80,7 +80,7 @@ const App = () => {
         </div>
 
         {/* Second Column - Labels Section */}
-        <div className="col-span-2 bg-white border rounded-lg shadow-md p-6 overflow-auto overflow-x-auto">
+        <div className="col-span-2 bg-gray-100 border rounded-lg shadow-md p-6 overflow-y-auto overflow-x-hidden">
           <LabelList year={selectedYear} season={selectedSeason} onSelectLabel={setSelectedLabel} labels={labels} fetchLabels={fetchLabels} />
         </div>
 

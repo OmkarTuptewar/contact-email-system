@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-// import { toast, ToastContainer } from 'react-toastify'; // Import toast and ToastContainer 
-// import 'react-toastify/dist/ReactToastify.css'; // Import the CSS for toast notifications 
+import { toast, ToastContainer } from 'react-toastify'; // Import toast and ToastContainer 
+import 'react-toastify/dist/ReactToastify.css'; // Import the CSS for toast notifications 
 
 const ContactForm = ({ year, season, selectedLabel, setContacts, fetchLabels }) => {
   const [label, setLabel] = useState(''); // State for label input
@@ -36,54 +36,53 @@ const ContactForm = ({ year, season, selectedLabel, setContacts, fetchLabels }) 
         setContacts(response.data.contacts);
         setContactList('');
         fetchLabels();
-        // toast.success('Contacts added successfully!'); // Show success toast 
+        toast.success('Contacts added successfully!'); // Show success toast 
       } else {
-        // toast.error('Unexpected response from server.'); // Handle unexpected status 
+        toast.error('Unexpected response from server.'); // Handle unexpected status 
       }
     } catch (error) {
       console.log('Error:', error.response ? error.response.data : error.message); // Log error details
-      // toast.error('Error adding contacts. Please try again.'); // Show error toast 
+      toast.error('Error adding contacts. Please try again.'); // Show error toast 
     }
   };
   
   const handleUpdateContact = async () => {
-    const updatedContacts = contactList.split(',').map(contact => contact.trim());
+    // Trim each contact and filter out empty strings
+    const updatedContacts = contactList.split(',')
+      .map(contact => contact.trim())
+      .filter(contact => contact !== ''); // Remove any empty contacts
+  
     const numericYear = parseInt(year); // Ensure year is a number
-    let shouldUpdateContacts = updatedContacts.length > 0;
-
-    // If updatedContacts is empty, set the flag to false
-    if (!shouldUpdateContacts) {
-      console.log('No new contacts provided, will only check for label change.');
-    }
-
+    const shouldUpdateContacts = updatedContacts.length > 0; // Check if there are valid contacts
+  
     try {
       const response = await axios.put('http://localhost:5000/api/contacts/update', {
         year: numericYear,
         season,
         oldLabel: selectedLabel,  // Existing label
-        newLabel: label,           // Updated label (if changed)
-        contacts: shouldUpdateContacts ? updatedContacts : undefined,  // Send updated contacts only if necessary
+        newLabel: label || undefined, // Send newLabel only if it's not empty
+        contacts: shouldUpdateContacts ? updatedContacts : undefined,  // Send contacts only if they exist
       });
-
+  
       console.log('Updated Contacts:', response.data.updatedContact);
-
-      // If contacts were updated, update the contacts state
+  
+      // Update the contacts state only if contacts were updated
       if (shouldUpdateContacts) {
         setContacts(response.data.updatedContact.contacts); // Update the state with new contacts
       } else {
-        // If only the label was updated, update the contacts state with the existing contacts
+        // If only the label was updated, keep the previous contacts
         setContacts(prevContacts => prevContacts); // Maintain previous contacts
       }
-     
+  
       setContactList(''); // Clear the contact list after update
       fetchLabels();
-      // toast.success('Contacts updated successfully!'); // Show success toast
+      toast.success('Contacts updated successfully!'); // Show success toast
     } catch (error) {
       console.log('Error updating contacts:', error);
-      // toast.error('Error updating contacts. Please try again.'); // Show error toast
+      toast.error('Error updating contacts. Please try again.'); // Show error toast
     }
   };
-
+  
   return (
     <div>
       <h3 className="font-bold text-lg mb-4 text-gray-800">
@@ -118,7 +117,7 @@ const ContactForm = ({ year, season, selectedLabel, setContacts, fetchLabels }) 
         {isEditing ? 'Update Contact' : 'Add Contact'}
       </button>
 
-      {/* <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick pauseOnHover draggable /> Add the ToastContainer here */}
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick pauseOnHover draggable /> 
     </div>
   );
 };
