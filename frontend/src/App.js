@@ -12,32 +12,30 @@ const App = () => {
   const [selectedSeason, setSelectedSeason] = useState('');
   const [selectedLabel, setSelectedLabel] = useState(null);
   const [contacts, setContacts] = useState([]);
-  const [labels, setLabels] = useState([]); // State for labels
+  const [labels, setLabels] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   // Fetch contacts when year, season, or label changes
   useEffect(() => {
     if (selectedYear && selectedSeason && selectedLabel) {
-      console.log("Fetching contacts for:", selectedYear, selectedSeason, selectedLabel);
       setLoading(true);
       setError('');
       axios.get(`http://localhost:5000/api/contacts/${selectedYear}/${selectedSeason}/${selectedLabel}`)
         .then((response) => {
-          console.log("Contacts fetched:", response.data);
           const fetchedContacts = response.data.length > 0 ? response.data[0].contacts : [];
           setContacts(fetchedContacts);
         })
         .catch((error) => {
           console.error('Error fetching contacts:', error);
-          setContacts([]);
+          // setContacts([]);
           setError('Failed to fetch contacts. Please try again.');
         })
         .finally(() => {
           setLoading(false);
         });
     } else {
-      setContacts([]);
+      // setContacts([]);
     }
   }, [selectedYear, selectedSeason, selectedLabel]);
 
@@ -61,6 +59,12 @@ const App = () => {
     fetchLabels(); // Fetch labels whenever selectedYear or selectedSeason changes
   }, [selectedYear, selectedSeason]);
 
+
+
+
+
+
+
   return (
     <>
       <div className="flex items-center justify-center bg-yellow h-24 shadow-lg">
@@ -70,21 +74,17 @@ const App = () => {
       </div>
 
       <div className="grid grid-cols-12 gap-2 p-2 h-screen bg-black">
-        
-        {/* First Column - Years Section */}
-        <div className="col-span-2 bg-white border rounded-lg shadow-md p-6 ">
+        <div className="col-span-2 bg-white border rounded-lg shadow-md p-6">
           <h2 className="font-bold text-lg mb-4">Years</h2>
           <AddYearButton onSelectYear={setSelectedYear} onSelectSeason={setSelectedSeason} />
           <YearList selectedYear={selectedYear} selectedSeason={selectedSeason} />
-          <YearLabels/>
+          <YearLabels onSelectYear={setSelectedYear} onSelectSeason={setSelectedSeason} fetchLabels={fetchLabels}/>
         </div>
 
-        {/* Second Column - Labels Section */}
         <div className="col-span-2 bg-gray-100 border rounded-lg shadow-md p-6 overflow-y-auto overflow-x-hidden">
-          <LabelList year={selectedYear} season={selectedSeason} onSelectLabel={setSelectedLabel} labels={labels} fetchLabels={fetchLabels} />
+          <LabelList year={selectedYear} season={selectedSeason} onSelectLabel={setSelectedLabel} fetchLabels={fetchLabels}/>
         </div>
 
-        {/* Third Column - Contacts Section */}
         <div className="col-span-8 bg-white border rounded-lg shadow-md p-6 flex flex-col">
           <h2 className="font-bold text-lg mb-4">Contacts</h2>
           <ContactForm 
@@ -92,7 +92,7 @@ const App = () => {
             season={selectedSeason} 
             selectedLabel={selectedLabel}
             setContacts={setContacts} 
-            fetchLabels={fetchLabels} // Ensure fetchLabels is available for contact form
+            fetchLabels={fetchLabels}
           />
           <div className="mt-4">
             {loading ? (

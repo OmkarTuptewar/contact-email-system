@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const LabelList = ({ year, season, onSelectLabel, fetchLabels }) => {
+const LabelList = ({ year, season, onSelectLabel,fetchLabels }) => {
   const [labels, setLabels] = useState([]);
 
   useEffect(() => {
@@ -21,8 +21,7 @@ const LabelList = ({ year, season, onSelectLabel, fetchLabels }) => {
   return (
     <>
       <h3 className="font-bold text-xl mb-2 text-gray-700">Labels</h3>
-      {/* Adjusted the width of the container to be dynamic and responsive */}
-      <div className="   rounded-lg p-2  shadow-md w-[190px]">
+      <div className="rounded-lg p-2 shadow-md w-full">
         <h4 className="font-semibold text-xl text-gray-600 mb-4">{season}</h4>
         <ul className="space-y-2">
           {labels.map((label, idx) => (
@@ -34,7 +33,6 @@ const LabelList = ({ year, season, onSelectLabel, fetchLabels }) => {
                 text-sm md:text-base lg:text-lg"
               onClick={() => handleLabelClick(label)}
             >
-              {/* Added `truncate` to handle long text and ensure it fits */}
               <span className="text-blue-600 font-medium truncate block">
                 {label.name || label.label || "Unnamed Label"}
               </span>

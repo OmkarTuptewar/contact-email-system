@@ -114,7 +114,7 @@ const ContactForm = ({ year, season, selectedLabel, setContacts, fetchLabels }) 
         className={`px-4 py-2 rounded text-white ${isEditing ? 'bg-red-500' : 'bg-blue-500'}`}
         onClick={isEditing ? handleUpdateContact : handleSubmit} // Call appropriate function
       >
-        {isEditing ? 'Update Contact' : 'Add Contact'}
+        {isEditing ? 'Append Contact' : 'Add Contact'}
       </button>
 
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick pauseOnHover draggable /> 

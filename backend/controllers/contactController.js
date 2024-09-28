@@ -45,7 +45,7 @@ exports.getContactsByYearAndSeason = async (req, res) => {
   }
 };
 
-exports.updateContacts = async (req, res) => {
+exports.appendContacts = async (req, res) => {
   const { year, season, oldLabel, newLabel, contacts } = req.body; // oldLabel and newLabel for possible label change
 
   try {
@@ -61,9 +61,9 @@ exports.updateContacts = async (req, res) => {
       contactEntry.label = newLabel;
     }
 
-    // Check if contacts is provided and not empty, then update the contacts
+    // Check if contacts is provided and not empty, then append the contacts to the existing list
     if (contacts && contacts.length > 0) {
-      contactEntry.contacts = contacts;
+      contactEntry.contacts = [...contactEntry.contacts, ...contacts]; // Append new contacts
     }
 
     // If both fields are empty, return an error indicating no update was made
@@ -75,11 +75,11 @@ exports.updateContacts = async (req, res) => {
     const updatedEntry = await contactEntry.save();
 
     res.status(200).json({
-      message: 'Contact entry updated successfully',
+      message: 'Contacts appended successfully',
       updatedContact: updatedEntry,
     });
   } catch (error) {
-    console.error('Error updating contacts:', error);
+    console.error('Error appending contacts:', error);
     res.status(500).json({ message: 'Server error', error });
   }
 };

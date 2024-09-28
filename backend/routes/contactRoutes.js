@@ -3,7 +3,7 @@ const {
   addContacts, 
   getContactsByYearAndSeason, 
   getContactsByYearSeasonAndLabel,
-  updateContacts,// Import the updateContacts function
+  appendContacts,// Import the updateContacts function
   getUniqueYears
 } = require('../controllers/contactController');
 
@@ -19,7 +19,7 @@ router.get('/:year/:season', getContactsByYearAndSeason);
 router.get('/:year/:season/:label', getContactsByYearSeasonAndLabel);
 
 // PUT route for updating contacts and label
-router.put('/update', updateContacts);
+router.put('/update', appendContacts);
 
 router.get('/season', getUniqueYears); 
 
