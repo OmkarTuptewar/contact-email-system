@@ -6,6 +6,7 @@ import ContactForm from './components/ContactForm';
 import ContactTable from './components/ContactTable';
 import axios from 'axios';
 import YearLabels from './components/YearLabels';
+import { Link } from 'react-router-dom';
 
 const App = () => {
   const [selectedYear, setSelectedYear] = useState('');
@@ -67,13 +68,19 @@ const App = () => {
 
   return (
     <>
-      <div className="flex items-center justify-center bg-yellow h-24 shadow-lg">
-        <h1 className="text-2xl font-extrabold text-gray-800 md:text-4xl">
-          CONTACT MANAGEMENT - KNOWMYSLOTS
-        </h1>
-      </div>
+     <div className="flex items-center justify-between bg-gradient-to-r from-yellow-400  h-24 shadow-lg p-4 md:p-6 rounded-lg">
+  <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+    CONTACT MANAGEMENT - KNOWMYSLOTS
+  </h1>
+  {/* Dashboard Button */}
+  <Link to="/dashboard">
+    <button className="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 ease-in-out shadow-md">
+      Go to Dashboard
+    </button>
+  </Link>
+</div>
 
-      <div className="grid grid-cols-12 gap-2 p-2 h-screen bg-black">
+      <div className="grid grid-cols-8 gap-2 p-2 h-screen bg-black">
         <div className="col-span-2 bg-white border rounded-lg shadow-md p-6">
           <h2 className="font-bold text-lg mb-4">Years</h2>
           <AddYearButton onSelectYear={setSelectedYear} onSelectSeason={setSelectedSeason} />
@@ -85,7 +92,7 @@ const App = () => {
           <LabelList year={selectedYear} season={selectedSeason} onSelectLabel={setSelectedLabel} fetchLabels={fetchLabels}/>
         </div>
 
-        <div className="col-span-8 bg-white border rounded-lg shadow-md p-6 flex flex-col">
+        <div className="col-span-4 bg-white border rounded-lg shadow-md p-6 flex flex-col">
           <h2 className="font-bold text-lg mb-4">Contacts</h2>
           <ContactForm 
             year={selectedYear} 

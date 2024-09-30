@@ -13,18 +13,29 @@ const ContactTable = ({ contacts = [] }) => {
 
   // Function to export the table to Excel
   const exportToExcel = () => {
-    // Prepare data for the Excel sheet
-    const worksheetData = rows.map(row =>
-      row.map(contact => (typeof contact === 'object' ? JSON.stringify(contact) : contact))
-    );
-
-    // Add header row
-    const header = Array(columns)
-      .fill(null)
-      .map((_, index) => `Contact ${index + 1}`);
+    // Create a new array to hold the worksheet data
+    const worksheetData = [];
+    
+    // Prepare the header row
+    const header = Array.from({ length: 10 }, (_, index) => `Contact ${index + 1}`);
+    worksheetData.push(header);
+    
+    // Fill in the contacts into the worksheet data
+    for (let i = 0; i < contacts.length; i++) {
+      // Every 10 contacts, we start a new row
+      const rowIndex = Math.floor(i / 10);
+      if (!worksheetData[rowIndex + 1]) {
+        worksheetData[rowIndex + 1] = [];
+      }
+      worksheetData[rowIndex + 1][i % 10] = contacts[i]; // Place the contact in the correct column
+    }
 
     // Create worksheet from data
-    const worksheet = XLSX.utils.aoa_to_sheet([header, ...worksheetData]);
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+
+    // Set column widths (adjust the widths as needed)
+    const columnWidths = Array.from({ length: 10 }, () => ({ wpx: 110 })); // Set width of 150 pixels for each column
+    worksheet['!cols'] = columnWidths;
 
     // Create a new workbook
     const workbook = XLSX.utils.book_new();
@@ -35,6 +46,7 @@ const ContactTable = ({ contacts = [] }) => {
     // Export the Excel file
     XLSX.writeFile(workbook, 'contacts.xlsx');
   };
+
 
   return (
     <div className="overflow-x-auto max-h-[50vh] overflow-y-auto">

@@ -1,16 +1,20 @@
 const Contact = require('../models/contactModel');
-
+const ExcelJS = require('exceljs');
 // Add contacts for a specific year and label
 exports.addContacts = async (req, res) => {
   const { year, season, label, contacts } = req.body;
+
   try {
-    let contactEntry = await Contact.findOne({ year, season, label });
-    
+    // Trim spaces only from label
+    const trimmedLabel = label.trim();
+
+    let contactEntry = await Contact.findOne({ year, season, label: trimmedLabel });
+
     if (contactEntry) {
       contactEntry.contacts = contacts;
       await contactEntry.save();
     } else {
-      contactEntry = new Contact({ year, season, label, contacts });
+      contactEntry = new Contact({ year, season, label: trimmedLabel, contacts });
       await contactEntry.save();
     }
 
@@ -19,6 +23,7 @@ exports.addContacts = async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
+
 
 // Get all labels and contacts for a specific year and season
 exports.getContactsByYearAndSeason = async (req, res) => {
@@ -30,6 +35,7 @@ exports.getContactsByYearAndSeason = async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
+
 
  exports.getContactsByYearSeasonAndLabel = async (req, res) => {
   const { year, season, label } = req.params;
@@ -49,16 +55,20 @@ exports.appendContacts = async (req, res) => {
   const { year, season, oldLabel, newLabel, contacts } = req.body; // oldLabel and newLabel for possible label change
 
   try {
-    // Find the contact entry by year, season, and old label
-    const contactEntry = await Contact.findOne({ year, season, label: oldLabel });
+    // Trim spaces from oldLabel and newLabel
+    const trimmedOldLabel = oldLabel.trim();
+    const trimmedNewLabel = newLabel ? newLabel.trim() : "";
+
+    // Find the contact entry by year, season, and old label (trimmed)
+    const contactEntry = await Contact.findOne({ year, season, label: trimmedOldLabel });
 
     if (!contactEntry) {
       return res.status(404).json({ message: 'Contact entry not found for the specified year, season, and label' });
     }
 
-    // Check if newLabel is provided and not empty, then update the label
-    if (newLabel && newLabel.trim() !== "") {
-      contactEntry.label = newLabel;
+    // Check if newLabel is provided and not empty, then update the label (trimmed)
+    if (trimmedNewLabel && trimmedNewLabel !== "") {
+      contactEntry.label = trimmedNewLabel;
     }
 
     // Check if contacts is provided and not empty, then append the contacts to the existing list
@@ -86,6 +96,7 @@ exports.appendContacts = async (req, res) => {
 
 
 
+
   exports.getUniqueYears = async (req, res) => {
     try {
       const years = await Contact.distinct('season'); // Assuming 'year' is the field in your contacts
@@ -95,3 +106,60 @@ exports.appendContacts = async (req, res) => {
       res.status(500).json({ message: 'Error fetching years' });
     }
   };
+
+  exports.getContacts = async (req, res) => {
+    try {
+      const contacts = await Contact.find(); // Fetch all contact documents
+      res.status(200).json(contacts);
+    } catch (error) {
+      console.error('Error fetching contacts:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+
+ exports.exportContacts = async (req, res) => {
+    try {
+      const contacts = await Contact.find();
+  
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Contacts');
+  
+      // Define columns
+      worksheet.columns = [
+        { header: 'ID', key: 'id', width: 25 },
+        { header: 'Year', key: 'year', width: 10 },
+        { header: 'Season', key: 'season', width: 15 },
+        { header: 'Label', key: 'label', width: 20 },
+        { header: 'Contacts', key: 'contacts', width: 30 },
+      ];
+  
+      // Add rows
+      contacts.forEach(contact => {
+        worksheet.addRow({
+          id: contact._id.toString(),
+          year: contact.year,
+          season: contact.season,
+          label: contact.label,
+          contacts: contact.contacts.join(', '),
+        });
+      });
+  
+      // Set response headers
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      );
+      res.setHeader(
+        'Content-Disposition',
+        'attachment; filename=' + 'Contacts.xlsx'
+      );
+  
+      await workbook.xlsx.write(res);
+      res.status(200).end();
+    } catch (error) {
+      console.error('Error exporting contacts:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+  
+  

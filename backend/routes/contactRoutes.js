@@ -4,7 +4,9 @@ const {
   getContactsByYearAndSeason, 
   getContactsByYearSeasonAndLabel,
   appendContacts,// Import the updateContacts function
-  getUniqueYears
+  getUniqueYears,
+  getContacts,
+  exportContacts
 } = require('../controllers/contactController');
 
 const router = express.Router();
@@ -22,5 +24,9 @@ router.get('/:year/:season/:label', getContactsByYearSeasonAndLabel);
 router.put('/update', appendContacts);
 
 router.get('/season', getUniqueYears); 
+
+router.get('/allcontacts', getContacts);
+
+router.get('/export', exportContacts);
 
 module.exports = router;
