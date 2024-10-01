@@ -145,7 +145,8 @@ exports.getContactsCategorised = async (req, res) => {
             if (!categorizedData[year]) {
                 categorizedData[year] = {
                     spring: { totalUnique: new Set(), total: 0 },
-                    fall: { totalUnique: new Set(), total: 0 }
+                    fall: { totalUnique: new Set(), total: 0 },
+                    totalUniquePerYear: 0 // Initialize totalUniquePerYear
                 };
             }
 
@@ -164,10 +165,20 @@ exports.getContactsCategorised = async (req, res) => {
             }
         });
 
-        // Convert the Sets for unique contacts to their sizes
+        // Calculate the unique contacts for each year
         Object.keys(categorizedData).forEach(year => {
-            categorizedData[year].spring.totalUnique = categorizedData[year].spring.totalUnique.size;
-            categorizedData[year].fall.totalUnique = categorizedData[year].fall.totalUnique.size;
+            const springUniqueContacts = categorizedData[year].spring.totalUnique;
+            const fallUniqueContacts = categorizedData[year].fall.totalUnique;
+
+            // Create a combined Set to ensure uniqueness across both seasons
+            const combinedUniqueContacts = new Set([...springUniqueContacts, ...fallUniqueContacts]);
+
+            // Set the unique counts for spring and fall
+            categorizedData[year].spring.totalUnique = springUniqueContacts.size;
+            categorizedData[year].fall.totalUnique = fallUniqueContacts.size;
+
+            // Calculate total unique contacts for the year from the combined set
+            categorizedData[year].totalUniquePerYear = combinedUniqueContacts.size;
         });
 
         // Prepare the final response object

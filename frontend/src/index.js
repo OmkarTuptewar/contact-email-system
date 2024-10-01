@@ -5,10 +5,14 @@ import './index.css';
 import App from './App';
 import { BrowserRouter as Router } from 'react-router-dom'; 
 import Dashboard from './dashboard/Dashboard';
+import { DarkModeProvider } from '../src/dashboard/DarkModeContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+      <DarkModeProvider>
+    
+   
     <Router>
     <Routes>
       {/* Define routes */}
@@ -20,5 +24,6 @@ root.render(
     </Routes>
      
     </Router>
+    </DarkModeProvider>
   </React.StrictMode>
 );

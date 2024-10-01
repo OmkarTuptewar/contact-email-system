@@ -53,10 +53,10 @@ const DashSearch = ({ contacts }) => {
   const contactsByYear = groupContactsByYear(filteredResults);
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 mb-4 relative">
-      <h2 className="text-xl font-semibold mb-2">Search Contacts</h2>
+    <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6 mb-6 relative transition-colors duration-300">
+      <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Search Contacts</h2>
       
-      <div className="flex">
+      <div className="flex flex-col sm:flex-row">
         <input
           type="text"
           value={searchTerm}
@@ -66,11 +66,13 @@ const DashSearch = ({ contacts }) => {
           }}
           onKeyPress={handleKeyPress}
           placeholder="Enter contact number"
-          className="border border-gray-300 rounded-l p-2 flex-grow"
+          aria-label="Search contact number"
+          className="border border-gray-300 dark:border-gray-700 rounded-md p-2 flex-grow bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300"
         />
         <button
           onClick={handleSearch}
-          className="bg-blue-500 text-white rounded-r px-4"
+          className="mt-2 sm:mt-0 sm:ml-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300"
+          aria-label="Search"
         >
           Search
         </button>
@@ -78,39 +80,38 @@ const DashSearch = ({ contacts }) => {
 
       {/* Live preview while typing */}
       {searchTerm.trim() && !searchTriggered && (
-        <div className="mt-2 text-gray-600 italic">
+        <div className="mt-3 text-gray-600 dark:text-gray-400 italic">
           Searching for "<span className="font-semibold">{searchTerm}</span>"
         </div>
       )}
 
-     {/* Display the number of search results */}
-{filteredResults.length > 0 && (
-  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg shadow-sm text-gray-700  max-h-60 overflow-y-auto">
-    <div className="font-semibold text-lg">
-      {filteredResults.length} contact{filteredResults.length > 1 ? 's' : ''} found
-    </div>
-    <div className="mt-2">
-      {Object.keys(contactsByYear).map(year => (
-        <div
-          key={year}
-          className="flex items-center justify-between py-2 px-3 bg-white border border-gray-200 rounded-lg shadow-sm mb-2"
-        >
-          <span className="font-medium text-gray-700">
-            Year: <span className="text-blue-600">{year}</span>
-          </span>
-          <span className="text-blue-500 font-semibold">
-            {contactsByYear[year].length} contact{contactsByYear[year].length > 1 ? 's' : ''}
-          </span>
+      {/* Display the number of search results */}
+      {filteredResults.length > 0 && (
+        <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg shadow-sm text-gray-700 dark:text-gray-200 max-h-60 overflow-y-auto transition-colors duration-300">
+          <div className="font-semibold text-lg mb-3">
+            {filteredResults.length} contact{filteredResults.length > 1 ? 's' : ''} found
+          </div>
+          <div className="space-y-2">
+            {Object.keys(contactsByYear).map(year => (
+              <div
+                key={year}
+                className="flex items-center justify-between py-2 px-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm transition-colors duration-300"
+              >
+                <span className="font-medium text-gray-700 dark:text-gray-300">
+                  Year: <span className="text-blue-600 dark:text-blue-400">{year}</span>
+                </span>
+                <span className="text-blue-500 dark:text-blue-300 font-semibold">
+                  {contactsByYear[year].length} contact{contactsByYear[year].length > 1 ? 's' : ''}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-      ))}
-    </div>
-  </div>
-)}
-
+      )}
 
       {/* Display "No contacts found" after search is triggered */}
       {searchTriggered && searchTerm.trim() && filteredResults.length === 0 && (
-        <div className="mt-2 text-red-600 font-semibold">
+        <div className="mt-4 text-red-600 dark:text-red-400 font-semibold">
           No contacts found for "<span className="font-semibold">{searchTerm}</span>"
         </div>
       )}
@@ -118,18 +119,25 @@ const DashSearch = ({ contacts }) => {
       {/* Search results - positioned above other elements */}
       {filteredResults.length > 0 && (
         <ul
-          className=" top-full left-0 right-0 z-50 bg-white shadow-lg rounded-lg mt-2 max-h-60 overflow-y-auto border border-gray-300"
+          className=" mt-2 w-full bg-white dark:bg-gray-700 shadow-lg rounded-lg max-h-60 overflow-y-auto border border-gray-300 dark:border-gray-600 z-50"
+          style={{
+            top: '100%', // Positions right below the search input
+            left: 0,      // Align to the left edge of the container
+            right: 0,     // Ensures it doesn't overflow to the right
+          }}
         >
           {filteredResults.map((contact, index) => (
             <li
               key={index}
-              className="py-3 px-4 mb-2 bg-gray-50 hover:bg-gray-100 rounded-lg shadow-sm border border-gray-200"
+              className="py-3 px-4 mb-2 bg-gray-50 dark:bg-gray-600 hover:bg-gray-100 dark:hover:bg-gray-500 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 transition-colors duration-300"
             >
               <div className="flex items-center justify-between">
-                <span className="font-bold text-gray-800">{contact.number}</span>
-                <span className="text-sm text-gray-600">{contact.year} • {contact.season}</span>
+                <span className="font-bold text-gray-800 dark:text-gray-200">{contact.number}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {contact.year} • {contact.season}
+                </span>
               </div>
-              <div className="text-sm text-gray-600">Label: {contact.label}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Label: {contact.label}</div>
             </li>
           ))}
         </ul>

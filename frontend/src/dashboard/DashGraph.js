@@ -38,8 +38,8 @@ const DashGraph = ({ contactsPerYear }) => {
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 -mt-[427px]  h-[405px]">
-  <h2 className="text-xl font-semibold">Total Contacts : Spring and Fall</h2>
+    <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 -mt-[427px]  h-[405px]">
+   <p className="text-xl font-semibold text-gray-900 dark:text-gray-200">Total Contacts : Spring and Fall</p>
   <Bar data={data} options={options} />
 </div>
 

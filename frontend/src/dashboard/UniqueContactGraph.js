@@ -1,3 +1,4 @@
+// UniqueContactGraph.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Bar } from 'react-chartjs-2';
@@ -6,7 +7,7 @@ import LineGraph from './LineGraph';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const UniqueContactGraph = ({contactsPerYear}) => {
+const UniqueContactGraph = ({ contactsPerYear }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -68,20 +69,18 @@ const UniqueContactGraph = ({contactsPerYear}) => {
   };
 
   return (
-    <div  >
-        <LineGraph
-          contactsPerYear={contactsPerYear}
-          uniquecontactsPerYear={data.categorizedData}
-        />
+    <div>
+      <LineGraph
+        contactsPerYear={contactsPerYear}
+        uniquecontactsPerYear={data.categorizedData}
+      />
 
-        <div className="bg-white shadow-md rounded-lg p-4 mt-10 ">
-        <p className='text-xl font-semibold'>Total Unique Contacts: {data.totalUniqueContacts-1}</p>
+      <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 mt-10">
+        <p className="text-xl font-semibold text-gray-900 dark:text-gray-200">
+          Total Unique Contacts: {data.totalUniqueContacts-1}
+        </p>
         <Bar data={chartData} options={options} />
-        
-
-        </div>
-    
-    
+      </div>
     </div>
   );
 };
