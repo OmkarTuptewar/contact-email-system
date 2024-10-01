@@ -17,9 +17,9 @@ const ExportContacts = () => {
   return (
     <button
       onClick={handleExport}
-       className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded m-3"
+       className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded m-3"
     >
-         <FontAwesomeIcon icon={faDownload} className="mr-2" />
+         <FontAwesomeIcon icon={faDownload} className="mr-2 " />
       Export Database
     </button>
   );

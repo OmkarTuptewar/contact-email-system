@@ -1,20 +1,24 @@
 const Contact = require('../models/contactModel');
 const ExcelJS = require('exceljs');
 // Add contacts for a specific year and label
+
 exports.addContacts = async (req, res) => {
   const { year, season, label, contacts } = req.body;
 
   try {
-    // Trim spaces only from label
+    // Trim spaces only from the label
     const trimmedLabel = label.trim();
+
+    // Remove spaces within each contact
+    const cleanedContacts = contacts.map(contact => contact.replace(/\s+/g, ''));
 
     let contactEntry = await Contact.findOne({ year, season, label: trimmedLabel });
 
     if (contactEntry) {
-      contactEntry.contacts = contacts;
+      contactEntry.contacts = cleanedContacts;
       await contactEntry.save();
     } else {
-      contactEntry = new Contact({ year, season, label: trimmedLabel, contacts });
+      contactEntry = new Contact({ year, season, label: trimmedLabel, contacts: cleanedContacts });
       await contactEntry.save();
     }
 

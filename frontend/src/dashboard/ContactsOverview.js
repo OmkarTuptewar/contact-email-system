@@ -26,7 +26,7 @@ const ContactsOverview = ({labelsPerYear}) => {
   }, []);
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6 max-h-[60vh]">
+    <div className="bg-white shadow-lg rounded-lg p-6 max-h-[62vh]">
       {/* Fixed header */}
       <h2 className="text-2xl font-semibold mb-4">Contacts Overview</h2>
 
