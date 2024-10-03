@@ -68,37 +68,54 @@ const App = () => {
 
   return (
     <>
-     <div className="flex items-center justify-between bg-gradient-to-r from-yellow-400  h-24 shadow-lg p-4 md:p-6 rounded-lg">
-  <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+         <div className="min-h-screen bg-gray-200">
+      {/* Header Section */}
+      <div className="flex items-center justify-between bg-gradient-to-r from-yellow-400 h-24 shadow-lg p-4 md:p-6 rounded-lg">
+  <h1 className="text-2xl md:text-4xl font-bold text-gray-900">
     CONTACT MANAGEMENT - KNOWMYSLOTS
   </h1>
-  {/* Dashboard Button */}
-  <Link to="/dashboard">
-    <button className="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 ease-in-out shadow-md">
-      Go to Dashboard
-    </button>
-  </Link>
+
+  <div className="flex space-x-4">
+    {/* Email Section Button */}
+    <Link to="/Email">
+      <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-sm md:text-base hover:bg-blue-700 hover:shadow-lg transition duration-300 ease-in-out shadow-md">
+        ADD EMAILS
+      </button>
+    </Link>
+
+    {/* Dashboard Button */}
+    <Link to="/dashboard">
+      <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-sm md:text-base hover:bg-blue-700 hover:shadow-lg transition duration-300 ease-in-out shadow-md">
+        Go to Dashboard
+      </button>
+    </Link>
+  </div>
 </div>
 
-      <div className="grid grid-cols-8 gap-2 p-2 h-screen bg-black">
-        <div className="col-span-2 bg-white border rounded-lg shadow-md p-6">
+
+      {/* Main Content */}
+      <div className="grid grid-cols-1 md:grid-cols-8 gap-2 p-2 bg-black rounded-lg">
+        {/* Left Sidebar - Years & Seasons */}
+        <div className="col-span-1 md:col-span-2 bg-white border rounded-lg shadow-md p-4">
           <h2 className="font-bold text-lg mb-4">Years</h2>
           <AddYearButton onSelectYear={setSelectedYear} onSelectSeason={setSelectedSeason} />
           <YearList selectedYear={selectedYear} selectedSeason={selectedSeason} />
-          <YearLabels onSelectYear={setSelectedYear} onSelectSeason={setSelectedSeason} fetchLabels={fetchLabels}/>
+          <YearLabels onSelectYear={setSelectedYear} onSelectSeason={setSelectedSeason} fetchLabels={fetchLabels} />
         </div>
 
-        <div className="col-span-2 bg-gray-100 border rounded-lg shadow-md p-6 overflow-y-auto overflow-x-hidden">
-          <LabelList year={selectedYear} season={selectedSeason} onSelectLabel={setSelectedLabel} fetchLabels={fetchLabels}/>
+        {/* Labels Section */}
+        <div className="col-span-1 md:col-span-2 bg-gray-100 border rounded-lg shadow-md p-4 overflow-y-auto">
+          <LabelList year={selectedYear} season={selectedSeason} onSelectLabel={setSelectedLabel} fetchLabels={fetchLabels} />
         </div>
 
-        <div className="col-span-4 bg-white border rounded-lg shadow-md p-6 flex flex-col">
+        {/* Contact Section */}
+        <div className="col-span-1 md:col-span-4 bg-white border rounded-lg shadow-md p-4 flex flex-col">
           <h2 className="font-bold text-lg mb-4">Contacts</h2>
-          <ContactForm 
-            year={selectedYear} 
-            season={selectedSeason} 
+          <ContactForm
+            year={selectedYear}
+            season={selectedSeason}
             selectedLabel={selectedLabel}
-            setContacts={setContacts} 
+            setContacts={setContacts}
             fetchLabels={fetchLabels}
           />
           <div className="mt-4">
@@ -112,6 +129,7 @@ const App = () => {
           </div>
         </div>
       </div>
+    </div>
     </>
   );
 };

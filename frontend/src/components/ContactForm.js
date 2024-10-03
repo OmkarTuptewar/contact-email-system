@@ -9,6 +9,7 @@ const ContactForm = ({ year, season, selectedLabel, setContacts, fetchLabels }) 
   const [isEditing, setIsEditing] = useState(false); // Track editing state
 
   useEffect(() => {
+
     console.log("Selected Label:", selectedLabel);
     if (selectedLabel) {
       setLabel(selectedLabel.name || selectedLabel.label || ''); // Set the label name
