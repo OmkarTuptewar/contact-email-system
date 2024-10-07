@@ -15,7 +15,7 @@ const UniqueContactGraph = ({ contactsPerYear }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/dashboard/handlecontacts');
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/dashboard/handlecontacts`);
         setData(response.data);
       } catch (err) {
         setError(err.message);

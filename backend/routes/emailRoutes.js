@@ -9,6 +9,7 @@ const {
   exportEmails
 } = require('../controllers/emailController');
 
+
 const router = express.Router();
 
 // POST route for adding emails
@@ -31,5 +32,9 @@ router.get('/allemails', getEmails);
 
 // GET route for exporting emails
 router.get('/export', exportEmails);
+
+
+
+
 
 module.exports = router;

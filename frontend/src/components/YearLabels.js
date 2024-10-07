@@ -9,7 +9,7 @@ const YearLabels = ({ onSelectYear, onSelectSeason,fetchLabels }) => {
   useEffect(() => {
     const fetchYears = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/contacts/season'); // Adjust the endpoint based on your API
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/contacts/season`); // Adjust the endpoint based on your API
         setYears(response.data); // Assuming response.data contains an array of years and seasons
       } catch (err) {
         setError(err.message);

@@ -7,7 +7,7 @@ const ExportContacts = () => {
   const handleExport = () => {
     // Create a hidden link element
     const link = document.createElement('a');
-    link.href = 'http://localhost:5000/api/contacts/export'; // Update with your backend URL if different
+    link.href = `${process.env.REACT_APP_API_URL}/api/contacts/export`; // Update with your backend URL if different
     link.download = 'Contacts.xlsx';
     document.body.appendChild(link);
     link.click();

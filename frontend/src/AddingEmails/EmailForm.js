@@ -20,14 +20,28 @@ const EmailForm = ({ year, season, selectedLabel, setEmails, fetchLabels }) => {
     }, [selectedLabel]);
   
     const handleSubmit = async () => {
-        const emails = emailList.split(',').map(email => email.trim());
+
+        const emails = emailList.split(/[\s,]+/).map(email => email.trim()).filter(email => email);
+
+        // Optional: Email validation regex (basic validation)
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const validEmails = emails.filter(email => emailRegex.test(email));
+    
+        // If you want to alert the user about invalid emails
+        const invalidEmails = emails.filter(email => !emailRegex.test(email));
+        if (invalidEmails.length > 0) {
+            console.warn('Invalid emails:', invalidEmails);
+            toast.error(`Some emails are invalid. Please check your input.${invalidEmails}`); // Show error toast for invalid emails
+            return; // Exit early if there are invalid emails
+        }
+
         const numericYear = parseInt(year);
         try {
-            const response = await axios.post('http://localhost:5000/api/email/add', {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/email/add`, {
                 year: numericYear,
                 season,
                 label,
-                emails,
+                emails: validEmails,
             });
     
             console.log("Response from server:", response.data); // Log response data
@@ -48,15 +62,15 @@ const EmailForm = ({ year, season, selectedLabel, setEmails, fetchLabels }) => {
     
     const handleUpdateEmail = async () => {
         // Trim each email and filter out empty strings
-        const updatedEmails = emailList.split(',')
-            .map(email => email.trim())
-            .filter(email => email !== ''); // Remove any empty emails
+        const updatedEmails = emailList.split(/[\s,]+/) // Split by spaces or commas
+        .map(email => email.trim()) // Trim whitespace from each email
+        .filter(email => email !== ''); // Remove any empty emails
     
         const numericYear = parseInt(year); // Ensure year is a number
         const shouldUpdateEmails = updatedEmails.length > 0; // Check if there are valid emails
     
         try {
-            const response = await axios.put('http://localhost:5000/api/email/update', {
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/email/update`, {
                 year: numericYear,
                 season,
                 oldLabel: selectedLabel,  // Existing label

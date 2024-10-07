@@ -27,7 +27,7 @@ const ExportOnlyContacts = ({ contacts = [] }) => {
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
 
     // Set column widths (adjust the widths as needed)
-    const columnWidths = Array.from({ length: 10 }, () => ({ wpx: 110 })); // Set width of 150 pixels for each column
+    const columnWidths = Array.from({ length: 10 }, () => ({ wpx: 150 })); // Set width of 150 pixels for each column
     worksheet['!cols'] = columnWidths;
 
     // Create a new workbook

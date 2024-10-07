@@ -7,7 +7,7 @@ const EmailLabelList = ({  year, season, onSelectLabel,fetchLabels }) => {
   useEffect(() => {
     if (year && season) {
       axios
-        .get(`http://localhost:5000/api/email/${year}/${season}`)
+        .get(`${process.env.REACT_APP_API_URL}/api/email/${year}/${season}`)
         .then((response) => setLabels(response.data))
         .catch((err) => console.log(err));
     }

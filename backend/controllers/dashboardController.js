@@ -1,6 +1,7 @@
 // controllers/dashboardController.js
 
 const Contact = require('../models/contactModel'); // Ensure the correct path
+const Email = require('../models/emailModel');
 
 
 exports.getDashboardData = async (req, res) => {
@@ -245,6 +246,121 @@ exports.getContactListWise = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+///////////////////////////////EMAILS//////////////////////////////////////////////////////
+
+
+
+exports.getEmailStatistics = async (req, res) => {
+    try {
+        const emails = await Email.find(); // Fetch all emails
+
+        // Initialize counters
+        const totalYears = new Set();
+        let totalStudent = 0;
+        let totalAgent = 0;
+        let totalEmails = 0;
+        const emailList = [];
+        const emailsPerYear = {};
+        const totalUniqueEmails = new Set();
+        // Initialize label counters
+        const totalLabels = new Set();
+        const labelsPerYear = {};
+
+        emails.forEach(email => {
+            const year = email.year; // Directly use the year field
+
+            // Check if the season exists and split it safely
+            const seasonParts = email.season ? email.season.split(' ') : [];
+            const season = seasonParts.length > 1 ? seasonParts[1].toLowerCase() : null;
+
+            // Add the year to the set for unique years
+            totalYears.add(year);
+
+            // Add label to totalLabels set
+            if (email.label) {
+                totalLabels.add(email.label);
+            }
+
+            // Update total emails count
+            if (Array.isArray(emails)) {
+                totalEmails += email.emails.length;
+                emailList.push(...email.emails);
+
+                // Add unique emails to the totalUniqueEmails set
+                email.emails.forEach(emailName => {
+                    if (emailName) {
+                        totalUniqueEmails.add(emailName);
+                    }
+                });
+            }
+
+            // Increment the student/agent counters based on the valid season
+            if (season === 'student') {
+                if (Array.isArray(email.emails)) {
+                    totalStudent += email.emails.length;
+                }
+            } else if (season === 'agent') {
+                if (Array.isArray(email.emails)) {
+                    totalAgent += email.emails.length;
+                }
+            }
+
+            // Initialize year data if not already present
+            if (!emailsPerYear[year]) {
+                emailsPerYear[year] = { student: 0, agent: 0 };
+            }
+
+            // Increment the count of emails for the appropriate season for that year
+            if (season && Array.isArray(email.emails)) {
+                emailsPerYear[year][season] += email.emails.length;
+            }
+
+            // Initialize labelsPerYear
+            if (!labelsPerYear[year]) {
+                labelsPerYear[year] = { student: new Set(), agent: new Set() };
+            }
+
+            // Add label to labelsPerYear
+            if (season && email.label) {
+                labelsPerYear[year][season].add(email.label);
+            }
+        });
+
+        // Convert labelsPerYear sets to arrays and counts
+        const formattedLabelsPerYear = {};
+        Object.entries(labelsPerYear).forEach(([year, seasons]) => {
+            formattedLabelsPerYear[year] = {
+                student: {
+                    count: seasons.student.size,
+                    labels: Array.from(seasons.student)
+                },
+                agent: {
+                    count: seasons.agent.size,
+                    labels: Array.from(seasons.agent)
+                }
+            };
+        });
+
+        res.status(200).json({
+            totalYears: totalYears.size, // Total unique years
+            totalStudent,
+            totalAgent,
+            totalEmails,
+            totalUniqueEmails: totalUniqueEmails.size, // Total unique emails
+            uniqueEmailList: Array.from(totalUniqueEmails),
+            emailList,
+            totalLabels: totalLabels.size, // Total unique labels
+            emailsPerYear,
+            labelsPerYear: formattedLabelsPerYear
+        });
+    } catch (error) {
+        console.error('Error fetching email statistics:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
 
 
 

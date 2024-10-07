@@ -69,8 +69,8 @@ const EmailTable = ({ emails = [] }) => {
                   key={index}
                   className="text-left py-2 px-4 border-b border-r border-gray-300"
                 >
-                  Email {index + 1}
-                </th>
+                   {}
+                </th> 
               ))}
           </tr>
         </thead>

@@ -11,7 +11,7 @@ const ContactsOverview = ({ labelsPerYear }) => {
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/dashboard/contactlist");
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/dashboard/contactlist`);
         if (!response.ok) {
           throw new Error("Failed to fetch contacts");
         }

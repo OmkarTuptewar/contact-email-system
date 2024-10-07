@@ -21,10 +21,13 @@ const ContactForm = ({ year, season, selectedLabel, setContacts, fetchLabels }) 
   }, [selectedLabel]);
 
   const handleSubmit = async () => {
-    const contacts = contactList.split(',').map(contact => contact.trim());
+    const contacts = contactList.split(/[\s,]+/) // Split by spaces or commas
+    .map(contact => contact.trim()) // Trim whitespace from each contact
+    .filter(contact => contact !== '');
+
     const numericYear = parseInt(year);
     try {
-      const response = await axios.post('http://localhost:5000/api/contacts/add', {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/contacts/add`, {
         year: numericYear,
         season,
         label,
@@ -49,7 +52,7 @@ const ContactForm = ({ year, season, selectedLabel, setContacts, fetchLabels }) 
   
   const handleUpdateContact = async () => {
     // Trim each contact and filter out empty strings
-    const updatedContacts = contactList.split(',')
+    const updatedContacts = contactList.split(/[\s,]+/)
       .map(contact => contact.trim())
       .filter(contact => contact !== ''); // Remove any empty contacts
   
@@ -57,7 +60,7 @@ const ContactForm = ({ year, season, selectedLabel, setContacts, fetchLabels }) 
     const shouldUpdateContacts = updatedContacts.length > 0; // Check if there are valid contacts
   
     try {
-      const response = await axios.put('http://localhost:5000/api/contacts/update', {
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/contacts/update`, {
         year: numericYear,
         season,
         oldLabel: selectedLabel,  // Existing label

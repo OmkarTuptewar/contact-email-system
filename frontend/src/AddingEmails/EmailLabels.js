@@ -9,7 +9,7 @@ const EmailLabels = ({ onSelectYear, onSelectSeason, fetchLabels }) => {
   useEffect(() => {
     const fetchYears = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/email/season');
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/email/season`);
         setYears(response.data);
       } catch (err) {
         setError(err.message);

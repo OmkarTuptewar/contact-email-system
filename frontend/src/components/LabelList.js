@@ -7,7 +7,7 @@ const LabelList = ({ year, season, onSelectLabel,fetchLabels }) => {
   useEffect(() => {
     if (year && season) {
       axios
-        .get(`http://localhost:5000/api/contacts/${year}/${season}`)
+        .get(`${process.env.REACT_APP_API_URL}/api/contacts/${year}/${season}`)
         .then((response) => setLabels(response.data))
         .catch((err) => console.log(err));
     }
@@ -21,9 +21,9 @@ const LabelList = ({ year, season, onSelectLabel,fetchLabels }) => {
   return (
     <>
       <h3 className="font-bold text-xl mb-2 text-gray-700">Labels</h3>
-      <div className="rounded-lg p-2 shadow-md w-full">
+      <div className="rounded-lg p-2 shadow-md w-full ">
         <h4 className="font-semibold text-xl text-gray-600 mb-4">{season}</h4>
-        <ul className="space-y-2">
+        <ul className="space-y-2   ">
           {labels.map((label, idx) => (
             <li
               key={idx}

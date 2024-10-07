@@ -22,7 +22,7 @@ const App = () => {
     if (selectedYear && selectedSeason && selectedLabel) {
       setLoading(true);
       setError('');
-      axios.get(`http://localhost:5000/api/contacts/${selectedYear}/${selectedSeason}/${selectedLabel}`)
+      axios.get(`${process.env.REACT_APP_API_URL}/api/contacts/${selectedYear}/${selectedSeason}/${selectedLabel}`)
         .then((response) => {
           const fetchedContacts = response.data.length > 0 ? response.data[0].contacts : [];
           setContacts(fetchedContacts);
@@ -48,7 +48,7 @@ const App = () => {
     }
   
     try {
-      const response = await axios.get(`http://localhost:5000/api/contacts/${selectedYear}/${selectedSeason}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/contacts/${selectedYear}/${selectedSeason}`);
       setLabels(response.data); // Set the labels in the state
     } catch (error) {
       console.error('Error fetching labels:', error);
@@ -104,7 +104,7 @@ const App = () => {
         </div>
 
         {/* Labels Section */}
-        <div className="col-span-1 md:col-span-2 bg-gray-100 border rounded-lg shadow-md p-4 overflow-y-auto">
+        <div className="col-span-1 md:col-span-2 bg-gray-100 border rounded-lg shadow-md p-4 overflow-y-auto max-h-[98vh]  ">
           <LabelList year={selectedYear} season={selectedSeason} onSelectLabel={setSelectedLabel} fetchLabels={fetchLabels} />
         </div>
 

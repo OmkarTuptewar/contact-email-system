@@ -32,7 +32,7 @@ const Main = () => {
         setLoading(true);
         setError('');
         try {
-          const response = await axios.get(`http://localhost:5000/api/email/${selectedYear}/${selectedSeason}/${selectedLabel}`);
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/email/${selectedYear}/${selectedSeason}/${selectedLabel}`);
           const fetchedEmails = response.data.length > 0 ? response.data[0].emails : [];
           setEmails(fetchedEmails);
         } catch (error) {
@@ -70,7 +70,7 @@ const Main = () => {
     }
 
     try {
-      const response = await axios.get(`http://localhost:5000/api/email/${selectedYear}/${selectedSeason}`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/email/${selectedYear}/${selectedSeason}`);
       setLabels(response.data); // Set labels in the state
     } catch (error) {
       console.error('Error fetching labels:', error);

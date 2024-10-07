@@ -49,7 +49,7 @@ const ContactTable = ({ contacts = [] }) => {
 
 
   return (
-    <div className="overflow-x-auto max-h-[50vh] overflow-y-auto">
+    <div className="overflow-x-auto max-h-[53vh] overflow-y-auto">
       
       <div className='flex justify-between items-center mb-4'>
       <h3 className="font-bold text-lg ">Contacts Table:</h3>
