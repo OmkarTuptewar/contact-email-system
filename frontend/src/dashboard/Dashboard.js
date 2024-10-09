@@ -137,7 +137,7 @@ const Dashboard = () => {
   return (
     <div className="container mx-auto p-6 relative bg-white dark:bg-gray-900 min-h-screen transition-colors duration-300">
       {/* Back Arrow */}
-      <Link to="/" className="absolute left-4 top-4">
+      <Link to="/Contact" className="absolute left-4 top-4">
         <FontAwesomeIcon
           icon={faArrowLeft}
           className="text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-3xl transition-colors duration-300"

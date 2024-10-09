@@ -4,7 +4,7 @@
 // import LabelList from '../components/LabelList';
 // import ContactForm from '../components/ContactForm';
 // import ContactTable from '../components/ContactTable';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext  } from 'react';
 import axios from 'axios';
 import AddEmailButton from './AddEmailButton';
 import EmailForm from './EmailForm';
@@ -15,7 +15,10 @@ import EmailTable from './EmailTable';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Font Awesome
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'; // Import the arrow icon
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import { AuthContext } from '../context/AuthContext';
 const Main = () => {
+
+  const { auth, logout } = useContext(AuthContext);
   const [selectedYear, setSelectedYear] = useState('');
   const [selectedSeason, setSelectedSeason] = useState('');
   const [selectedLabel, setSelectedLabel] = useState(null);
@@ -49,19 +52,6 @@ const Main = () => {
     fetchEmails();
   }, [selectedYear, selectedSeason, selectedLabel]);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
   // Fetch labels based on the selected year and season
   const fetchLabels = async () => {
     if (!selectedYear || !selectedSeason) {
@@ -85,14 +75,33 @@ const Main = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between bg-gradient-to-r from-yellow-400 h-24 shadow-lg p-4 md:p-6 rounded-lg">
-      <Link to="/" className="text-gray-900 hover:text-gray-600 transition-colors">
-          <FontAwesomeIcon icon={faArrowLeft} className="text-2xl" />
-        </Link>
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
-          EMAIL MANAGEMENT - KNOWMYSLOTS
-        </h1>
-      </div>
+     <div className="flex items-center justify-between bg-gradient-to-r from-yellow-400 h-24 shadow-lg p-4 md:p-6 rounded-lg">
+  <Link to="/Contact" className="text-gray-900 hover:text-gray-600 transition-colors">
+    <FontAwesomeIcon icon={faArrowLeft} className="text-2xl" />
+  </Link>
+  
+  <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+    EMAIL MANAGEMENT - KNOWMYSLOTS
+  </h1>
+  
+  <div className="flex flex-col items-end">
+    {/* Welcome Message */}
+    <p className="text-gray-700 text-lg font-semibold mb-1">
+      Welcome, {auth.username}!
+    </p>
+    
+    {/* Logout Button */}
+    <button
+      onClick={logout}
+      className="py-2 px-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition duration-200"
+    >
+      Logout
+    </button>
+  </div>
+</div>
+
+
+      
 
       <div className="grid grid-cols-1 md:grid-cols-8 gap-2 p-2 h-screen bg-black">
         {/* Sidebar Section */}
@@ -124,6 +133,8 @@ const Main = () => {
             setEmails={setEmails} // Renamed prop
             fetchLabels={fetchLabels} 
           />
+
+         {auth.role === 'admin' && (
           <div className="mt-4">
             {loading ? (
               <p>Loading emails...</p> // Updated text
@@ -133,6 +144,7 @@ const Main = () => {
               <EmailTable emails={emails} /> // Renamed prop
             )}
           </div>
+           )}
         </div>
       </div>
     </div>
