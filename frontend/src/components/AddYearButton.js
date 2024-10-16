@@ -35,13 +35,13 @@ const AddYearButton = ({ onSelectYear, onSelectSeason }) => {
             className="bg-green-500 text-white px-4 py-2 rounded mr-2 mb-2"
             onClick={() => handleSelectSeason(`${year} Spring`)}
           >
-            Spring {year}
+            Spring 
           </button>
           <button
             className="bg-orange-500 text-white px-4 py-2 rounded mb-2"
             onClick={() => handleSelectSeason(`${year} Fall`)}
           >
-            Fall {year}
+            Fall 
           </button>
         </div>
       )}

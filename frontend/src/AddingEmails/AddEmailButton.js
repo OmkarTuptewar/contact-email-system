@@ -35,13 +35,13 @@ const AddEmailButton = ({ onSelectYear, onSelectSeason }) => {
           className="bg-green-500 text-white px-4 py-2 rounded mr-2 mb-2"
           onClick={() => handleSelectSeason(`${year} Student`)}
         >
-          Student {year}
+          Student 
         </button>
         <button
           className="bg-orange-500 text-white px-4 py-2 rounded mb-2"
           onClick={() => handleSelectSeason(`${year} Agent`)}
         >
-          Agent {year}
+          Agent 
         </button>
       </div>
     )}

@@ -6,7 +6,8 @@ const {
   appendContacts,// Import the updateContacts function
   getUniqueYears,
   getContacts,
-  exportContacts
+  exportContacts,
+  addChildLabel
 } = require('../controllers/contactController');
 
 const router = express.Router();

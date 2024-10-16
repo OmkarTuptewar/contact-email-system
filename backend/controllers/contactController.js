@@ -121,7 +121,7 @@ exports.appendContacts = async (req, res) => {
     }
   };
 
- exports.exportContacts = async (req, res) => {
+  exports.exportContacts = async (req, res) => {
     try {
       const contacts = await Contact.find();
   
@@ -165,4 +165,4 @@ exports.appendContacts = async (req, res) => {
       res.status(500).json({ message: 'Server error' });
     }
   };
-  
+
