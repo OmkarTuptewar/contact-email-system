@@ -1,9 +1,4 @@
-// import AddYearButton from '../components/AddYearButton';
-// import YearList from '../components/YearList';
-// import YearLabels from '../components/YearLabels';
-// import LabelList from '../components/LabelList';
-// import ContactForm from '../components/ContactForm';
-// import ContactTable from '../components/ContactTable';
+
 import React, { useState, useEffect, useContext  } from 'react';
 import axios from 'axios';
 import AddEmailButton from './AddEmailButton';

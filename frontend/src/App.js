@@ -65,10 +65,18 @@ const App = () => {
         {/* Header Section */}
         <div className="flex items-center justify-between bg-gradient-to-r from-yellow-400 h-24 shadow-lg p-4 md:p-6 rounded-lg">
   <h1 className="text-2xl md:text-4xl font-bold text-gray-900">
-    CONTACT MANAGEMENT - KNOWMYSLOTS
+    CONTACT MANAGEMENT-KNOWMYSLOTS
   </h1>
 
   <div className="flex flex-col md:flex-row items-center space-x-4">
+    
+    {/* Link Section Button */}
+    <Link to="/Link">
+      <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-sm md:text-base hover:bg-blue-700 hover:shadow-lg transition duration-300 ease-in-out shadow-md">
+        ADD LINKS
+      </button>
+    </Link>
+
     {/* Email Section Button */}
     <Link to="/Email">
       <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-sm md:text-base hover:bg-blue-700 hover:shadow-lg transition duration-300 ease-in-out shadow-md">
