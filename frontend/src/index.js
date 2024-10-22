@@ -12,6 +12,7 @@ import Login from './auth/Login';
 import PrivateRoute from "./auth/PrivateRoute";
 import { AuthProvider } from './context/AuthContext';
 import Unauthorized from './auth/Unauthorized'; // Ensure this component exists
+import MainPdf from './AddingPdfs/Main';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -60,6 +61,16 @@ root.render(
               element={
                 <PrivateRoute roles={['admin', 'guest']}>
                   <Mainn />
+                </PrivateRoute>
+              }
+            />
+
+             {/* Link: Admin and Guest */}
+             <Route
+              path="/Pdf"
+              element={
+                <PrivateRoute roles={['admin', 'guest']}>
+                  <MainPdf />
                 </PrivateRoute>
               }
             />

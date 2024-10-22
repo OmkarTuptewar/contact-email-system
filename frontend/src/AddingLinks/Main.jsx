@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import Dropdown from '../components/Dropdown';
 
 const Main = () => {
   const { auth, logout } = useContext(AuthContext);
@@ -72,11 +73,15 @@ const Main = () => {
           LINK MANAGEMENT - KNOWMYSLOTS
         </h1>
         
-        <div className="flex flex-col items-end">
+        <div className="flex flex-col md:flex-row items-center space-x-4">
+          {/* Dropdown Menu */}
+          <Dropdown />
+          {/* Welcome Message */}
           <p className="text-gray-700 text-lg font-semibold mb-1">
             Welcome, {auth.username}!
           </p>
-          
+
+          {/* Logout Button */}
           <button
             onClick={logout}
             className="py-2 px-4 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 transition duration-200"
@@ -84,6 +89,7 @@ const Main = () => {
             Logout
           </button>
         </div>
+
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-8 gap-2 p-2 h-screen bg-black">

@@ -9,6 +9,8 @@ import ExportOnlyContacts from "./ExportOnlyContacts";
 import UniqueContactGraph from "./UniqueContactGraph";
 import ContactsOverview from "./ContactsOverview";
 import DarkMode from "./DarkMode";
+import LinksStats from "./LinkStats";
+import PdfStats from "./PdfStats";
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState({
@@ -294,7 +296,25 @@ const Dashboard = () => {
           </p>
           <ExportOnlyContacts contacts={emailData.uniqueEmailList} />
         </div>
+
+    
+  
+        
+       
+
+
       </div>
+      <LinksStats />
+      <PdfStats />
+     
+
+{/* ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// */}
+
+
+
+
+
+
 
       {/* Contacts Overview and Graph */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

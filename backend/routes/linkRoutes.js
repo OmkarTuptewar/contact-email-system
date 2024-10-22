@@ -1,5 +1,5 @@
 const express = require('express');
-const { addYear, addOrUpdateLabel, getLabelsForYear, getUniqueYears, appendLinks, getLinksForYearAndLabel, updateLabel } = require('../controllers/LinkController');
+const { addYear, addOrUpdateLabel, getLabelsForYear, getUniqueYears, appendLinks, getLinksForYearAndLabel, updateLabel, getLinkStats } = require('../controllers/LinkController');
 
 const router = express.Router();
 
@@ -23,6 +23,8 @@ router.put('/update-label', updateLabel);
 
 // Route to get links for a provided year and label
 router.get('/:year/:label/links', getLinksForYearAndLabel);
+
+router.get('/stats', getLinkStats); 
 
 
 module.exports = router;

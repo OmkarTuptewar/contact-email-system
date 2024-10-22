@@ -211,6 +211,54 @@ const updateLabel = async (req, res) => {
   }
 };
 
+const getLinkStats = async (req, res) => {
+  try {
+      // Fetch all links from the database
+      const linkData = await Link.find({});
+
+      // Initialize variables to store results
+      let totalLabels = 0;
+      let totalLinks = 0;
+      let linksList = [];
+      let uniqueLinksSet = new Set(); // To track unique links
+      let yearsSet = new Set(); // To track unique years
+
+      // Iterate over each link document
+      linkData.forEach(link => {
+          // Add year to the set (set only stores unique values)
+          yearsSet.add(link.year);
+
+          // Count labels if they exist
+          if (link.label) totalLabels++;
+
+          // Iterate through each link in the Links array
+          link.Links.forEach(linkUrl => {
+              if (linkUrl) {
+                  totalLinks++;
+                  linksList.push(linkUrl);
+                  uniqueLinksSet.add(linkUrl); // Add to the set for unique links
+              }
+          });
+      });
+
+      // Prepare the response
+      const stats = {
+          totalUniqueYears: yearsSet.size,
+          totalLabels: totalLabels,
+          totalLinks: totalLinks,
+          totalUniqueLinks: uniqueLinksSet.size,
+          totalLinksList: linksList,
+          totalUniqueLinksList: Array.from(uniqueLinksSet), // Convert set back to an array
+      };
+
+      // Send the response
+      res.status(200).json(stats);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server Error' });
+  }
+};
+
 
 module.exports = {
   addYear,
@@ -220,4 +268,5 @@ module.exports = {
   appendLinks,
   getLinksForYearAndLabel,
   updateLabel,
+  getLinkStats,
 };

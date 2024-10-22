@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Font Awesom
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'; // Import the arrow icon
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import { AuthContext } from '../context/AuthContext';
+import Dropdown from '../components/Dropdown';
 const Main = () => {
 
   const { auth, logout } = useContext(AuthContext);
@@ -79,12 +80,17 @@ const Main = () => {
     EMAIL MANAGEMENT - KNOWMYSLOTS
   </h1>
   
-  <div className="flex flex-col items-end">
+  <div className="flex flex-col md:flex-row items-center space-x-4">
+
+         {/* Dropdown Menu */}
+         <Dropdown />
     {/* Welcome Message */}
     <p className="text-gray-700 text-lg font-semibold mb-1">
+
+
       Welcome, {auth.username}!
     </p>
-    
+ 
     {/* Logout Button */}
     <button
       onClick={logout}
