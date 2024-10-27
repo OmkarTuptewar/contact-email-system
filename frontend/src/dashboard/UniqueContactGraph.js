@@ -77,7 +77,7 @@ const UniqueContactGraph = ({ contactsPerYear }) => {
 
       <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 mt-10">
         <p className="text-xl font-semibold text-gray-900 dark:text-gray-200">
-          Total Unique Contacts: {data.totalUniqueContacts-1}
+          Total Unique Contacts: {data.totalUniqueContacts}
         </p>
         <Bar data={chartData} options={options} />
       </div>

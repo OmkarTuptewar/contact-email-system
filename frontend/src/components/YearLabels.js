@@ -46,10 +46,10 @@ const YearLabels = ({ onSelectYear, onSelectSeason,fetchLabels }) => {
             const isFall = year.toLowerCase().includes('fall');
 
             const bgColorClass = isSpring 
-              ? 'bg-green-200' 
+              ? 'bg-green-300' 
               : isFall 
-                ? 'bg-red-200' 
-                : 'bg-gray-100';
+                ? 'bg-red-300' 
+                : 'bg-gray-400';
 
             // Extract the first numbers of the year key
             const yearNumber = year.split(' ')[0]; // Assumes year is the first part of the string

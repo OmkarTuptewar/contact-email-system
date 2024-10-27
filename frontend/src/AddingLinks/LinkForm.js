@@ -8,10 +8,12 @@ const LinkForm = ({ year, selectedLabel, setLinks, fetchLabels, updateSelectedLa
     const [linkList, setLinkList] = useState('');
     const [loading, setLoading] = useState(false);
     const [isEditingLabel, setIsEditingLabel] = useState(false);
-    const [label, setLabel] = useState(selectedLabel); // Store the label directly
+    const [label, setLabel] = useState(selectedLabel);
+    const [tempLabel, setTempLabel] = useState(selectedLabel); // Temporary state for the label
 
     useEffect(() => {
-        setLabel(selectedLabel); // Update the label when selectedLabel changes
+        setLabel(selectedLabel); // Update label when selectedLabel changes
+        setTempLabel(selectedLabel); // Also update tempLabel
     }, [selectedLabel]);
 
     const handleUpdateLink = async () => {
@@ -28,7 +30,7 @@ const LinkForm = ({ year, selectedLabel, setLinks, fetchLabels, updateSelectedLa
         try {
             const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/link/append-links`, {
                 year: numericYear,
-                label: label, // Use updated label instead of selectedLabel
+                label, // Use current label
                 newLinks: updatedLinks,
             });
 
@@ -45,28 +47,30 @@ const LinkForm = ({ year, selectedLabel, setLinks, fetchLabels, updateSelectedLa
     };
 
     const handleLabelEdit = () => {
-        setIsEditingLabel(!isEditingLabel); // Toggle edit mode
+        setIsEditingLabel(true); // Enable edit mode
     };
 
     const handleSaveLabel = async () => {
-        if (!label.trim()) {
+        if (!tempLabel.trim()) {
             toast.error('Label name cannot be empty.');
             return;
         }
-
+    
         setLoading(true);
-
+    
         try {
             const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/link/update-label`, {
                 year,
-                oldLabel: selectedLabel, // The current label before update
-                newLabel: label, // The updated label
+                oldLabel: label, // The current label before update
+                newLabel: tempLabel, // The updated label
             });
-
+    
             if (response.status === 200) {
+                setLabel(tempLabel); // Update the main label state
                 fetchLabels(); // Refresh labels list after update
-                updateSelectedLabel(label); // Update selectedLabel in the parent
+                updateSelectedLabel(tempLabel); // Update selectedLabel in the parent
                 toast.success('Label updated successfully!');
+                setIsEditingLabel(false); // Exit edit mode
             } else {
                 toast.error('Failed to update label. Please try again.');
             }
@@ -74,11 +78,11 @@ const LinkForm = ({ year, selectedLabel, setLinks, fetchLabels, updateSelectedLa
             console.error('Error updating label:', error);
             toast.error('Error updating label. Please try again.');
         } finally {
+            setLoading(false); // Ensure loading state is updated in both cases
             setIsEditingLabel(false); // Exit edit mode
-            setLoading(false);
         }
     };
-
+    
     return (
         <div>
             <h3 className="font-bold text-lg mb-4 text-gray-800">
@@ -88,11 +92,11 @@ const LinkForm = ({ year, selectedLabel, setLinks, fetchLabels, updateSelectedLa
                         <input
                             type="text"
                             className="border p-1 rounded"
-                            value={label}
-                            onChange={(e) => setLabel(e.target.value)}
+                            value={tempLabel} 
+                            onChange={(e) => setTempLabel(e.target.value)} 
                         />
                     ) : (
-                        label // Display the label directly
+                        label 
                     )}
                 </span>
                 {isEditingLabel ? (
@@ -118,7 +122,7 @@ const LinkForm = ({ year, selectedLabel, setLinks, fetchLabels, updateSelectedLa
             <button
                 className="px-4 py-2 rounded text-white bg-red-500"
                 onClick={handleUpdateLink}
-                disabled={loading} // Disable the button during loading
+                disabled={loading} 
             >
                 Append Link
             </button>

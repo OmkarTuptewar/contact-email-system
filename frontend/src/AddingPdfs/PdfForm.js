@@ -45,15 +45,19 @@ const PdfForm = ({ year, selectedLabel, setPdfs, fetchLabels, updateSelectedLabe
                 },
             });
 
-            setPdfs(response.data.pdfs); // Update state with the appended PDFs
-            setFile(null); // Reset the file input state
-            setDescription(''); // Reset the description input
-            fetchLabels(); // Refresh the labels list
-            toast.success('PDF uploaded successfully!');
+            if (response.status === 200) {
+                setPdfs(response.data.pdfs); // Update state with the appended PDFs
+                setFile(null); // Reset the file input state
+                setDescription(''); // Reset the description input
+                fetchLabels(); // Refresh the labels list
+                toast.success('PDF uploaded successfully!');
 
-            // Reset the file input field
-            if (fileInputRef.current) {
-                fileInputRef.current.value = ''; // Clear the file input
+                // Reset the file input field
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = ''; // Clear the file input
+                }
+            } else {
+                toast.error('Failed to upload PDF. Please try again.');
             }
         } catch (error) {
             console.error('Error uploading PDF:', error);
@@ -86,6 +90,7 @@ const PdfForm = ({ year, selectedLabel, setPdfs, fetchLabels, updateSelectedLabe
                 fetchLabels(); // Refresh labels list after update
                 updateSelectedLabel(label); // Update selectedLabel in the parent
                 toast.success('Label updated successfully!');
+                setIsEditingLabel(false); // Exit edit mode
             } else {
                 toast.error('Failed to update label. Please try again.');
             }
@@ -93,13 +98,13 @@ const PdfForm = ({ year, selectedLabel, setPdfs, fetchLabels, updateSelectedLabe
             console.error('Error updating label:', error);
             toast.error('Error updating label. Please try again.');
         } finally {
-            setIsEditingLabel(false); // Exit edit mode
             setLoading(false);
+          
         }
     };
 
     return (
-        <div >
+        <div>
             <h3 className="font-bold text-lg mb-4 text-gray-800">
                 Append PDF to:
                 <span className="text-blue-900 font-bold text-1xl p-2 hover:text-blue-600 transition-colors duration-300">
@@ -109,6 +114,7 @@ const PdfForm = ({ year, selectedLabel, setPdfs, fetchLabels, updateSelectedLabe
                             className="border p-1 rounded"
                             value={label}
                             onChange={(e) => setLabel(e.target.value)}
+                            disabled={loading} // Disable input during loading
                         />
                     ) : (
                         label // Display the label directly
@@ -126,24 +132,23 @@ const PdfForm = ({ year, selectedLabel, setPdfs, fetchLabels, updateSelectedLabe
                     />
                 )}
             </h3>
+
             <div className="flex flex-col mb-2 space-y-2">
-    <input
-        type="file"
-        className="border p-2 rounded"
-        onChange={handleFileChange}
-        accept="application/pdf"
-        ref={fileInputRef}
-    />
-    <textarea
-        className="border p-2 rounded"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        placeholder="Enter PDF Description"
-        rows={4} // Adjust the number of rows for more space
-    />
-</div>
-
-
+                <input
+                    type="file"
+                    className="border p-2 rounded"
+                    onChange={handleFileChange}
+                    accept="application/pdf"
+                    ref={fileInputRef}
+                />
+                <textarea
+                    className="border p-2 rounded"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Enter PDF Description"
+                    rows={4} // Adjust the number of rows for more space
+                />
+            </div>
 
             <button
                 className="px-4 py-2 rounded text-white bg-red-500"

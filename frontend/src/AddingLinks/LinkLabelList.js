@@ -1,43 +1,55 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
-// Modal component for adding a new label
+import { toast } from 'react-toastify'; 
 const Modal = ({ isOpen, onClose, onSubmit, year }) => {
   const [newLabel, setNewLabel] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (newLabel) {
-      try {
-        const requestBody = {
-          year,
-          label: newLabel,
-          links: [], // Initialize with an empty links array
-        };
-        console.log("Sending request body:", requestBody); // Log the request body
+ 
 
-        // Send the request to add a new label
-        const response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/api/link/add-labels`,
-          requestBody
-        );
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (newLabel) {
+    try {
+      const requestBody = {
+        year,
+        label: newLabel,
+        links: [], // Initialize with an empty links array
+      };
+      
+      // Send the request to add a new label
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/link/add-labels`,
+        requestBody
+      );
 
-        // Handle both 200 and 201 as success
-        if (response.status === 200 || response.status === 201) {
-          onSubmit(newLabel); // Call the onSubmit function with the new label
-          setNewLabel(""); // Clear the input field
-          onClose(); // Close the modal
-        } else {
-          console.error("Unexpected response:", response);
-        }
-      } catch (error) {
-        console.error(
-          "Error adding label:",
-          error.response ? error.response.data : error.message
-        );
+      // Handle both 200 and 201 as success
+      if (response.status === 200 || response.status === 201) {
+        onSubmit(newLabel); // Call the onSubmit function with the new label
+        setNewLabel(""); // Clear the input field
+        onClose(); // Close the modal
+
+        // Show a success toast notification
+        toast.success('Label added successfully!');
+      } else {
+        console.error("Unexpected response:", response);
+        toast.error('Unexpected response from the server.');
       }
+    } catch (error) {
+      console.error(
+        "Error adding label:",
+        error.response ? error.response.data : error.message
+      );
+
+      // Show an error toast notification
+      toast.error(
+        error.response ? error.response.data.message : 'Error adding label.'
+      );
     }
-  };
+  } else {
+    toast.warning('Please enter a label.'); // Notify user if no label is provided
+  }
+};
+
 
   // Return null if the modal is not open
   if (!isOpen) return null;
@@ -136,7 +148,7 @@ const LinkLabelList = ({ year, onSelectLabel, fetchLabels }) => {
               onClick={() => handleLabelClick(labelObj)} // Pass the object
             >
               <span className="text-blue-600 font-medium truncate block">
-                {labelObj.label || labelObj.name || "Unnamed Label"}
+                {labelObj.label|| "Unnamed Labellll"}
                 {/* Ensure we fall back to 'name' if 'label' is missing */}
               </span>
             </li>

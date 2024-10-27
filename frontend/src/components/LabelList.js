@@ -1,35 +1,43 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+import { toast } from 'react-toastify';
 
 const Modal = ({ isOpen, onClose, onSubmit, year, season, contacts }) => {
   const [newLabel, setNewLabel] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (newLabel) {
       try {
-       
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/contacts/add`, {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/contacts/add-label`, {
           label: newLabel,
           year,
           season,
-          contacts, 
+          contacts,
         });
-
-        if (response.status === 200) {
+  
+        if (response.status === 201) {
+          toast.success("Label added successfully!"); // Success toast
           onSubmit(newLabel); 
           setNewLabel(""); 
           onClose(); 
         } else {
           console.error("Unexpected response:", response);
+          toast.error("Unexpected response from the server."); // Error toast
         }
       } catch (error) {
         console.error("Error adding label:", error);
+        
+        // Check if error response exists and extract message
+        const errorMessage = error.response?.data?.message || "Error adding label. Please try again.";
+        toast.error(errorMessage); // Error toast with server message or fallback
       }
+    } else {
+      toast.warn("Please enter a label."); // Warning toast for empty label
     }
   };
-
+  
   if (!isOpen) return null; 
 
   return (
@@ -93,16 +101,16 @@ const LabelList = ({ year, season, onSelectLabel, fetchLabels }) => {
         Labels
         <button
           onClick={() => setIsModalOpen(true)}
-          className="ml-48 bg-blue-500 text-white p-1 px-4 rounded-full" 
+          className="ml-44 bg-blue-500 text-white p-1 px-4 rounded-full" 
           title="Add new label"
         >
           +
         </button>
       </h3>
-      <div className="flex justify-between items-center">
-        <div className="rounded-lg p-2 shadow-md w-full">
+      <div className="flex justify-between items-center ">
+        <div className="rounded-lg  p-2  w-full  max-h-[45vh] ">
           <h4 className="font-semibold text-xl text-gray-600 mb-4">{season}</h4>
-          <ul className="space-y-2">
+          <ul className="space-y-2 ">
             {labels.map((label, idx) => (
               <li
                 key={idx}

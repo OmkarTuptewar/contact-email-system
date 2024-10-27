@@ -1,34 +1,43 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
+import { toast } from 'react-toastify';
 
 const Modal = ({ isOpen, onClose, onSubmit, year, season }) => {
   const [newLabel, setNewLabel] = useState("");
+
+ 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (newLabel) {
       try {
-        
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/email/add`, {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/email/add-label`, {
           year,
           season,
           label: newLabel,
           emails: [], 
         });
-
-        if (response.status === 200) {
+  
+        if (response.status === 201) {
           onSubmit(newLabel); 
           setNewLabel(""); 
           onClose();
+          
+          // Show success toast
+          toast.success("Label added successfully!");
         } else {
           console.error("Unexpected response:", response);
+          // Show generic error toast
+          toast.error("Something went wrong. Please try again.");
         }
       } catch (error) {
         console.error("Error adding label:", error);
+        // Show error toast with error message
+        toast.error("Error adding label: " + (error.response?.data?.message || "Please try again later."));
       }
     }
   };
+  
 
   if (!isOpen) return null; 
 
@@ -92,7 +101,7 @@ const EmailLabelList = ({ year, season, onSelectLabel, fetchLabels }) => {
         Labels
         <button
           onClick={() => setIsModalOpen(true)}
-          className="ml-48 bg-blue-500 text-white p-1 px-4 rounded-full"
+          className="ml-44 bg-blue-500 text-white p-1 px-4 rounded-full"
           title="Add new label"
         >
           +

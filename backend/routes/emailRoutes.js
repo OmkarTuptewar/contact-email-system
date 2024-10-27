@@ -3,10 +3,11 @@ const {
   addEmails, 
   getEmailsByYearAndSeason, 
   getEmailsByYearSeasonAndLabel,
-  appendEmails, // Import the function for appending/updating emails
   getUniqueEmailYears,
   getEmails,
-  exportEmails
+  exportEmails,
+  updateLabel,
+  addEmailLabel
 } = require('../controllers/emailController');
 
 
@@ -21,8 +22,6 @@ router.get('/:year/:season', getEmailsByYearAndSeason);
 // GET route for fetching emails by year, season, and label
 router.get('/:year/:season/:label', getEmailsByYearSeasonAndLabel);
 
-// PUT route for updating emails and label
-router.put('/update', appendEmails);
 
 // GET route for fetching unique years for emails
 router.get('/season', getUniqueEmailYears);
@@ -33,8 +32,9 @@ router.get('/allemails', getEmails);
 // GET route for exporting emails
 router.get('/export', exportEmails);
 
+router.put('/update-label', updateLabel);
 
-
+router.post('/add-label', addEmailLabel);
 
 
 module.exports = router;

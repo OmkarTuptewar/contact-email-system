@@ -7,7 +7,8 @@ const {
   updateLabel, 
   appendPdfs,
   getPdfsForYearAndLabel,
-  getPdfStats
+  getPdfStats,
+  getPdfs
 } = require('../controllers/pdfController');
 const multer = require('multer');
 const path = require('path');
@@ -52,6 +53,7 @@ router.put('/update-label', updateLabel);
 // Route to get PDF files for a provided year and label
 router.get('/:year/:label/pdfs', getPdfsForYearAndLabel);
 
+router.get('/getpdfs', getPdfs);
 
 router.get('/stats', getPdfStats); 
 

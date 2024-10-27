@@ -12,12 +12,15 @@ exports.addContacts = async (req, res) => {
     // Remove spaces within each contact
     const cleanedContacts = contacts.map(contact => contact.replace(/\s+/g, ''));
 
+    // Check if a contact entry for the same year, season, and label already exists
     let contactEntry = await Contact.findOne({ year, season, label: trimmedLabel });
 
     if (contactEntry) {
-      contactEntry.contacts = cleanedContacts;
+      // Append new contacts to the existing ones without filtering duplicates
+      contactEntry.contacts = [...contactEntry.contacts, ...cleanedContacts];
       await contactEntry.save();
     } else {
+      // Create a new contact entry if it doesn't exist
       contactEntry = new Contact({ year, season, label: trimmedLabel, contacts: cleanedContacts });
       await contactEntry.save();
     }
@@ -54,50 +57,6 @@ exports.getContactsByYearAndSeason = async (req, res) => {
     res.status(500).json({ message: 'Error fetching contacts', error });
   }
 };
-
-exports.appendContacts = async (req, res) => {
-  const { year, season, oldLabel, newLabel, contacts } = req.body; // oldLabel and newLabel for possible label change
-
-  try {
-    // Trim spaces from oldLabel and newLabel
-    const trimmedOldLabel = oldLabel.trim();
-    const trimmedNewLabel = newLabel ? newLabel.trim() : "";
-
-    // Find the contact entry by year, season, and old label (trimmed)
-    const contactEntry = await Contact.findOne({ year, season, label: trimmedOldLabel });
-
-    if (!contactEntry) {
-      return res.status(404).json({ message: 'Contact entry not found for the specified year, season, and label' });
-    }
-
-    // Check if newLabel is provided and not empty, then update the label (trimmed)
-    if (trimmedNewLabel && trimmedNewLabel !== "") {
-      contactEntry.label = trimmedNewLabel;
-    }
-
-    // Check if contacts is provided and not empty, then append the contacts to the existing list
-    if (contacts && contacts.length > 0) {
-      contactEntry.contacts = [...contactEntry.contacts, ...contacts]; // Append new contacts
-    }
-
-    // If both fields are empty, return an error indicating no update was made
-    if (!newLabel && (!contacts || contacts.length === 0)) {
-      return res.status(400).json({ message: 'No updates were provided' });
-    }
-
-    // Save the updated contact entry
-    const updatedEntry = await contactEntry.save();
-
-    res.status(200).json({
-      message: 'Contacts appended successfully',
-      updatedContact: updatedEntry,
-    });
-  } catch (error) {
-    console.error('Error appending contacts:', error);
-    res.status(500).json({ message: 'Server error', error });
-  }
-};
-
 
 
 
@@ -165,4 +124,70 @@ exports.appendContacts = async (req, res) => {
       res.status(500).json({ message: 'Server error' });
     }
   };
+
+  exports.updatelabel= async (req, res) => {
+    const { year, season, oldLabel, newLabel } = req.body;
+  
+    try {
+      // Check if a contact with the same year, season, and newLabel already exists
+      const existingContact = await Contact.findOne({ year, season, label: newLabel });
+      if (existingContact) {
+        return res.status(400).json({ error: 'A label with this name already exists for the same year and season.' });
+      }
+  
+      // Update the label if no duplicate found
+      const updatedContact = await Contact.findOneAndUpdate(
+        { year, season, label: oldLabel }, // Find by year, season, and current label
+        { label: newLabel }, // Update the label field
+        { new: true } // Return the updated document
+      );
+  
+      if (!updatedContact) {
+        return res.status(404).json({ error: 'Contact label not found.' });
+      }
+  
+      res.status(200).json({ message: 'Label updated successfully.', updatedContact });
+    } catch (error) {
+      console.error('Error updating label:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
+
+   
+
+
+
+
+exports.addLabel = async (req, res) => {
+  const { year, season, label, contacts } = req.body;
+
+  try {
+    // Trim spaces only from the label
+    const trimmedLabel = label.trim();
+
+    // Check if a contact entry with the same year, season, and label already exists
+    const existingLabel = await Contact.findOne({ year, season, label: trimmedLabel });
+
+    if (existingLabel) {
+      // Return a 400 error if a label already exists for the given year and season
+      return res.status(400).json({ message: `The label "${label}" for the specified year and season already exists.` });
+    }
+
+    // Create a new contact entry
+    const newContactEntry = new Contact({
+      year,
+      season,
+      label: trimmedLabel,
+      contacts:[]
+    });
+
+    await newContactEntry.save();
+
+    res.status(201).json(newContactEntry); // Return the new contact entry with 201 Created status
+  } catch (error) {
+    console.error("Error adding label:", error);
+    res.status(500).json({ message: 'Server error. Please try again later.', error });
+  }
+};
+
 

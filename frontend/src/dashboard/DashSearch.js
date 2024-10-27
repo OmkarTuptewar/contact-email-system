@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
-const DashSearch = ({ contacts, emails }) => {
+const DashSearch = ({ contacts, emails, pdfdata }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredResults, setFilteredResults] = useState([]);
   const [searchTriggered, setSearchTriggered] = useState(false);
 
-  // Helper function to group contacts and emails by year
+ 
   const groupResultsByYear = (results) => {
     return results.reduce((acc, result) => {
       const { year } = result;
@@ -20,38 +20,51 @@ const DashSearch = ({ contacts, emails }) => {
   const handleSearch = () => {
     if (!searchTerm.trim()) {
       setFilteredResults([]);
-      setSearchTriggered(true); // Trigger the "No contacts found" message
+      setSearchTriggered(true); 
       return;
     }
 
-    // Flatten all contacts and emails with their associated year, season, and label
+    // Flatten all contacts and emails
     const allContacts = contacts.flatMap(contactDoc =>
       contactDoc.contacts.map(contactNumber => ({
         number: contactNumber,
         year: contactDoc.year,
         season: contactDoc.season,
         label: contactDoc.label,
+        field: 'Contact Management', 
       }))
     );
 
-    // Flatten all emails with their associated year, season, and label
     const allEmails = emails.flatMap(emailDoc =>
       emailDoc.emails.map(emailAddress => ({
         email: emailAddress,
         year: emailDoc.year,
         season: emailDoc.season,
         label: emailDoc.label,
+        field: 'Email Management', 
       }))
     );
 
-    // Filter results based on the search term for both contacts and emails
+    // Flatten PDF data
+    const allPdfs = pdfdata.flatMap(pdfDoc =>
+      pdfDoc.pdfs.map(pdf => ({
+        url: pdf.url,
+        description: pdf.description,
+        year: pdfDoc.year,
+        label: pdfDoc.label,
+        field: 'PDF Management', 
+      }))
+    );
+
+  
     const results = [
       ...allContacts.filter(contact => contact.number.includes(searchTerm.trim())),
-      ...allEmails.filter(email => email.email.includes(searchTerm.trim()))
+      ...allEmails.filter(email => email.email.includes(searchTerm.trim())),
+      ...allPdfs.filter(pdf => pdf.description.includes(searchTerm.trim()))
     ];
 
     setFilteredResults(results);
-    setSearchTriggered(true); // Search has been triggered
+    setSearchTriggered(true); 
   };
 
   const handleKeyPress = (e) => {
@@ -60,7 +73,7 @@ const DashSearch = ({ contacts, emails }) => {
     }
   };
 
-  // Group filtered results by year
+
   const resultsByYear = groupResultsByYear(filteredResults);
 
   return (
@@ -73,11 +86,11 @@ const DashSearch = ({ contacts, emails }) => {
           value={searchTerm}
           onChange={e => {
             setSearchTerm(e.target.value);
-            setSearchTriggered(false); // Reset when typing
+            setSearchTriggered(false); 
           }}
           onKeyPress={handleKeyPress}
-          placeholder="Enter contact number or email"
-          aria-label="Search contact number or email"
+          placeholder="Enter contact number, email, or PDF description"
+          aria-label="Search contact number, email, or PDF description"
           className="border border-gray-300 dark:border-gray-700 rounded-md p-2 flex-grow bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300"
         />
         <button
@@ -89,14 +102,14 @@ const DashSearch = ({ contacts, emails }) => {
         </button>
       </div>
 
-      {/* Live preview while typing */}
+    
       {searchTerm.trim() && !searchTriggered && (
         <div className="mt-3 text-gray-600 dark:text-gray-400 italic">
           Searching for "<span className="font-semibold">{searchTerm}</span>"
         </div>
       )}
 
-      {/* Display the number of search results */}
+    
       {filteredResults.length > 0 && (
         <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg shadow-sm text-gray-700 dark:text-gray-200 max-h-60 overflow-y-auto transition-colors duration-300">
           <div className="font-semibold text-lg mb-3">
@@ -120,21 +133,21 @@ const DashSearch = ({ contacts, emails }) => {
         </div>
       )}
 
-      {/* Display "No contacts found" after search is triggered */}
+     
       {searchTriggered && searchTerm.trim() && filteredResults.length === 0 && (
         <div className="mt-4 text-red-600 dark:text-red-400 font-semibold">
           No results found for "<span className="font-semibold">{searchTerm}</span>"
         </div>
       )}
 
-      {/* Search results - positioned above other elements */}
+     
       {filteredResults.length > 0 && (
         <ul
           className="mt-2 w-full bg-white dark:bg-gray-700 shadow-lg rounded-lg max-h-60 overflow-y-auto border border-gray-300 dark:border-gray-600 z-50"
           style={{
-            top: '100%', // Positions right below the search input
-            left: 0,      // Align to the left edge of the container
-            right: 0,     // Ensures it doesn't overflow to the right
+            top: '100%', 
+            left: 0,     
+            right: 0,    
           }}
         >
           {filteredResults.map((result, index) => (
@@ -144,13 +157,16 @@ const DashSearch = ({ contacts, emails }) => {
             >
               <div className="flex items-center justify-between">
                 <span className="font-bold text-gray-800 dark:text-gray-200">
-                  {result.number || result.email}
+                  {result.number || result.email || result.description}
                 </span>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {result.season}
+                  {result.season || result.year} 
                 </span>
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Label: {result.label}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Label: {result.label} <br />
+                Field: {result.field}
+              </div>
             </li>
           ))}
         </ul>
@@ -158,6 +174,5 @@ const DashSearch = ({ contacts, emails }) => {
     </div>
   );
 };
-
 
 export default DashSearch;

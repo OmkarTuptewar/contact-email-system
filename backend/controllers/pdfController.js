@@ -17,7 +17,7 @@ const addYear = async (req, res) => {
 
     const newPdf = new Pdf({
       year,
-      label: label || "", // Optional: default to an empty string if not provided
+      label: label || "EDIT THIS LABEL", // Optional: default to an empty string if not provided
       pdfs: pdfs || [], // Optional: default to an empty array if not provided
     });
 
@@ -138,8 +138,9 @@ const updateLabel = async (req, res) => {
   const { year, oldLabel, newLabel } = req.body;
 
   try {
+    // Check if the old label exists
     const pdfEntry = await Pdf.findOne({ year, label: oldLabel });
-
+    
     if (!pdfEntry) {
       return res
         .status(404)
@@ -148,6 +149,18 @@ const updateLabel = async (req, res) => {
         });
     }
 
+    // Check if the new label already exists
+    const existingLabel = await Pdf.findOne({ year, label: newLabel });
+    
+    if (existingLabel) {
+      return res
+        .status(400)
+        .json({
+          message: `Label '${newLabel}' already exists for year ${year}.`,
+        });
+    }
+
+    // Update the label since it does not already exist
     pdfEntry.label = newLabel;
     await pdfEntry.save();
 
@@ -156,6 +169,7 @@ const updateLabel = async (req, res) => {
     return res.status(500).json({ message: "Error updating label", error });
   }
 };
+
 
 const appendPdfs = async (req, res) => {
   const { year, label } = req.body;
@@ -238,6 +252,15 @@ const getPdfStats = async (req, res) => {
   }
 };
 
+const getPdfs = async (req, res) => {
+  try {
+    const pdfs = await Pdf.find(); // Fetch all PDF documents
+    res.status(200).json(pdfs); // Return the PDFs with a 200 status
+  } catch (error) {
+    console.error('Error fetching PDFs:', error);
+    res.status(500).json({ message: 'Server error' }); // Return a 500 error if something goes wrong
+  }
+};
 
 
 
@@ -247,6 +270,7 @@ module.exports = {
   getLabelsForYear,
   getUniqueYears,
   appendPdfs,
+  getPdfs,
   getPdfsForYearAndLabel,
   updateLabel,
   getPdfStats,

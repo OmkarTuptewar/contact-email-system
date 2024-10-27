@@ -19,8 +19,8 @@ const addYear = async (req, res) => {
     // Create a new Link document with the provided data
     const newLink = new Link({
       year,
-      label: label || "", // Optional: default to an empty string if not provided
-      Links: Links || [], // Optional: default to an empty array if not provided
+      label: label || "Edit this label", 
+      Links: Links || [], 
     });
 
     // Save the document to the database
@@ -194,22 +194,29 @@ const updateLabel = async (req, res) => {
   const { year, oldLabel, newLabel } = req.body;
 
   try {
-      // Find the document with the given year and old label
-      const linkEntry = await Link.findOne({ year, label: oldLabel });
+    // Find the document with the given year and old label
+    const linkEntry = await Link.findOne({ year, label: oldLabel });
 
-      if (!linkEntry) {
-          return res.status(404).json({ message: `No entry found for year ${year} with label '${oldLabel}'.` });
-      }
+    if (!linkEntry) {
+      return res.status(404).json({ message: `No entry found for year ${year} with label '${oldLabel}'.` });
+    }
 
-      // Update the label
-      linkEntry.label = newLabel; // Update the label property as necessary
-      await linkEntry.save();
+    // Check if the new label already exists for the same year
+    const existingLabel = await Link.findOne({ year, label: newLabel });
+    if (existingLabel) {
+      return res.status(400).json({ message: `Label '${newLabel}' already exists for year ${year}.` });
+    }
 
-      return res.status(200).json(linkEntry);
+    // Update the label
+    linkEntry.label = newLabel; // Update the label property as necessary
+    await linkEntry.save();
+
+    return res.status(200).json(linkEntry);
   } catch (error) {
-      return res.status(500).json({ message: "Error updating label", error });
+    return res.status(500).json({ message: "Error updating label", error });
   }
 };
+
 
 const getLinkStats = async (req, res) => {
   try {

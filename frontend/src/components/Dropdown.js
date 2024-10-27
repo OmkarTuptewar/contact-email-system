@@ -40,27 +40,27 @@ const Dropdown = () => {
           <div className="rounded-md bg-white ring-1 ring-black ring-opacity-5">
 
           <Link to="/Contact">
-              <div className="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-500 hover:text-white transition duration-200 ease-in-out cursor-pointer rounded-t-md">
+              <div className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-500 hover:text-white transition duration-200 ease-in-out cursor-pointer rounded-t-md">
                Contact Management
               </div>
             </Link>
             <Link to="/Link">
-              <div className="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-500 hover:text-white transition duration-200 ease-in-out cursor-pointer rounded-t-md">
+              <div className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-500 hover:text-white transition duration-200 ease-in-out cursor-pointer rounded-t-md">
                 Link Management
               </div>
             </Link>
             <Link to="/Email">
-              <div className="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-500 hover:text-white transition duration-200 ease-in-out cursor-pointer">
+              <div className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-500 hover:text-white transition duration-200 ease-in-out cursor-pointer">
                Emails Management
               </div>
             </Link>
             <Link to="/Pdf">
-              <div className="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-500 hover:text-white transition duration-200 ease-in-out cursor-pointer">
+              <div className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-500 hover:text-white transition duration-200 ease-in-out cursor-pointer">
               Pdfs Management
               </div>
             </Link>
             <Link to="/dashboard">
-              <div className="px-4 py-2 text-sm text-gray-700 hover:bg-yellow-500 hover:text-white transition duration-200 ease-in-out cursor-pointer rounded-b-md">
+              <div className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-500 hover:text-white transition duration-200 ease-in-out cursor-pointer rounded-b-md">
                 Go To Dashboard
               </div>
             </Link>

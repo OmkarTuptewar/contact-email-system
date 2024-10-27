@@ -14,6 +14,8 @@ const AddYearButton = ({ onSelectYear, onSelectSeason }) => {
     setShowSeasons(false);
   };
 
+  
+
   return (
     <div className="max-w-md mx-auto p-4">
       <input

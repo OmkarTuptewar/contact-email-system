@@ -1,23 +1,16 @@
 // src/context/AuthContext.js
 import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode'; 
+import { toast} from 'react-toastify'; 
 
 // Create the context
 export const AuthContext = createContext();
 
-// Hardcoded credentials (for demonstration purposes)
-const adminCredentials = {
-  password: 'admin123',
-};
-
-const guestCredentials = {
-  password: 'guest123',
-};
-
 // Create a provider component
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
-
+  
   // Initialize state from localStorage
   const [auth, setAuth] = useState(() => {
     const storedAuth = localStorage.getItem('auth');
@@ -26,7 +19,6 @@ export const AuthProvider = ({ children }) => {
       : { isAuthenticated: false, role: null, username: null };
   });
 
-  // Error state
   const [error, setError] = useState(null);
 
   // Update localStorage whenever auth changes
@@ -34,35 +26,47 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('auth', JSON.stringify(auth));
   }, [auth]);
 
-  // Admin login function
-  const loginAdmin = (password) => {
-    if (password === adminCredentials.password) {
+  // Login function
+  const login = async (username, password) => {
+    try {
+      const response = await fetch('/api/v1/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Login failed. Please check your credentials.');
+      }
+  
+      const data = await response.json();
+   
+      const { token } = data; 
+      const decodedToken = jwtDecode(token); 
+      
+  
+      const { role } = decodedToken; 
+  
+      
       setAuth({
         isAuthenticated: true,
-        role: 'admin',
-        username: 'admin', // Optional: Set a default username for admin
+        role: role === 'staff' ? 'guest' : 'admin', 
+        username: username, 
       });
+  
       setError(null);
-      navigate('/Contact'); // Redirect after successful login
-    } else {
-      setError('Invalid password for Admin');
+      toast.success('Login successful!'); 
+      navigate('/Contact'); 
+    } catch (error) {
+      console.error('Error during login:', error); 
+      setError(error.message);
+      toast.error(error.message);
     }
   };
 
-  // Guest login function
-  const loginGuest = (username, password) => {
-    if (password === guestCredentials.password) {
-      setAuth({
-        isAuthenticated: true,
-        role: 'guest',
-        username: username,
-      });
-      setError(null);
-      navigate('/Contact'); // Redirect after successful login
-    } else {
-      setError('Invalid password for Guest');
-    }
-  };
+
 
   // Logout function
   const logout = () => {
@@ -75,8 +79,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ auth, loginAdmin, loginGuest, logout, error }}>
+    <>
+    
+    
+    <AuthContext.Provider value={{ auth, login, logout, error }}>
       {children}
     </AuthContext.Provider>
+    </>
   );
 };

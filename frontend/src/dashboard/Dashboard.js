@@ -41,6 +41,8 @@ const Dashboard = () => {
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
+  const [pdfdata,setPdfdata]=useState([]);
+
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -112,7 +114,24 @@ const Dashboard = () => {
       }
     };
 
+    const fetchPdfData = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/pdf/getpdfs`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch pdf data");
+        }
+        const data = await response.json();
+        setPdfdata(data);
+      } catch (err) {
+        console.error("Error fetching pdf data:", err);
+        setError(err.message);
+      }
+    };
+
     fetchDashboardData();
+    fetchPdfData();
     fetchContacts();
     fetchEmailData();
     fetchEmails();
@@ -162,8 +181,8 @@ const Dashboard = () => {
         </p>
       </div>
 
-      {/* Search Component */}
-      <DashSearch contacts={contacts} emails={emails} />
+        {/* Search Component */}  
+        <DashSearch contacts={contacts} emails={emails} pdfdata={pdfdata}/>
 
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

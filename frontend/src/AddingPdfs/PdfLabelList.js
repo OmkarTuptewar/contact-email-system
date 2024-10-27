@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-// Modal component for adding a new PDF label
 const Modal = ({ isOpen, onClose, onSubmit, year }) => {
   const [newLabel, setNewLabel] = useState("");
 
@@ -12,34 +13,36 @@ const Modal = ({ isOpen, onClose, onSubmit, year }) => {
         const requestBody = {
           year,
           label: newLabel,
-          pdfs: [], // Initialize with an empty pdfs array
+          pdfs: [],
         };
-        console.log("Sending request body:", requestBody); // Log the request body
-
-        // Send the request to add a new label
+  
         const response = await axios.post(
           `${process.env.REACT_APP_API_URL}/api/pdf/add-labels`,
           requestBody
         );
-
-        // Handle both 200 and 201 as success
+  
         if (response.status === 200 || response.status === 201) {
-          onSubmit(newLabel); // Call the onSubmit function with the new label
-          setNewLabel(""); // Clear the input field
-          onClose(); // Close the modal
+          onSubmit(newLabel);
+          setNewLabel("");
+          onClose();
+          toast.success('Label added successfully!');
         } else {
-          console.error("Unexpected response:", response);
+          toast.error('Failed to add label. Please try again.');
         }
       } catch (error) {
-        console.error(
-          "Error adding label:",
-          error.response ? error.response.data : error.message
-        );
+        if (error.response) {
+          // Accessing error response details
+          const message = error.response.data?.message || 'Error adding label. Please try again.';
+          toast.error(message);
+        } else {
+          toast.error('Error adding label. Please check your network or try again later.');
+        }
       }
+    } else {
+      toast.warning('Please enter a label.');
     }
   };
-
-  // Return null if the modal is not open
+  
   if (!isOpen) return null;
 
   return (
@@ -77,44 +80,47 @@ const Modal = ({ isOpen, onClose, onSubmit, year }) => {
   );
 };
 
-// Main PdfLabelList component
 const PdfLabelList = ({ year, onSelectLabel, fetchLabels }) => {
   const [labels, setLabels] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch labels for the given year
   useEffect(() => {
-    if (year) {
-      axios
-        .get(`${process.env.REACT_APP_API_URL}/api/pdf/${year}/labels`)
-        .then((response) => {
-          console.log("Fetched labels:", response.data); // Log fetched labels to inspect structure
+    const fetchLabelsData = async () => {
+      if (year) {
+        try {
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/pdf/${year}/labels`);
+          console.log("Fetched labels:", response.data);
           setLabels(response.data);
-        })
-        .catch((err) => console.log(err));
-    }
+        } catch (err) {
+          console.log(err);
+          toast.error('Failed to fetch labels. Please try again.'); // Notify on fetch error
+        } finally {
+          setLoading(false); // Set loading to false after fetch
+        }
+      }
+    };
+
+    fetchLabelsData();
   }, [year, fetchLabels]);
 
-  // Handle label click to select the label
   const handleLabelClick = (label) => {
     console.log("Label clicked:", label.label);
-    onSelectLabel(label.label); // Pass the selected label to the parent component
+    onSelectLabel(label.label);
   };
 
-  // Add a new label to the list
   const handleAddLabel = (newLabel) => {
-    // Create the new label object
     const newLabelObj = {
       name: newLabel,
-      label: newLabel, // Ensure this matches the structure from the backend
-      pdfs: [], // Representing PDFs instead of links
+      label: newLabel,
+      pdfs: [],
     };
-    setLabels((prevLabels) => [...prevLabels, newLabelObj]); // Add new label to state
+    setLabels((prevLabels) => [...prevLabels, newLabelObj]);
   };
 
   return (
     <>
-      <h3 className="font-bold text-xl mb-2 text-gray-700">
+      <h3 className="font-bold text-xl mb-2 text-gray-700 ">
         PDF Labels
         <button
           onClick={() => setIsModalOpen(true)}
@@ -124,31 +130,33 @@ const PdfLabelList = ({ year, onSelectLabel, fetchLabels }) => {
           +
         </button>
       </h3>
-      <div className="rounded-lg p-2 shadow-md w-full">
-        <ul className="space-y-2">
-          {labels.map((labelObj, idx) => (
-            <li
-              key={idx}
-              className="cursor-pointer mb-2 p-3 border border-gray-300 rounded-lg transition duration-300 ease-in-out 
-        transform hover:bg-blue-200 hover:shadow-xl hover:scale-105 active:scale-95 
-        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 
-        text-sm md:text-base lg:text-lg"
-              onClick={() => handleLabelClick(labelObj)} // Pass the object
-            >
-              <span className="text-blue-600 font-medium truncate block">
-                {labelObj.label || labelObj.name || "Unnamed Label"}
-                {/* Ensure we fall back to 'name' if 'label' is missing */}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
+     
+        <div className="rounded-lg p-2 shadow-md w-full ">
+          <ul className="space-y-2">
+            {labels.map((labelObj, idx) => (
+              <li
+                key={labelObj.id || idx}
+                className="cursor-pointer mb-2 p-3 border border-gray-300 rounded-lg transition duration-300 ease-in-out 
+                transform hover:bg-blue-200 hover:shadow-xl hover:scale-105 active:scale-95 
+                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 
+                text-sm md:text-base lg:text-lg"
+                onClick={() => handleLabelClick(labelObj)}
+              >
+                <span className="text-blue-600 font-medium truncate block">
+                  {labelObj.label || labelObj.name || "Unnamed Label"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+     
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleAddLabel}
         year={year}
       />
+  
     </>
   );
 };

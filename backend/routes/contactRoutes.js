@@ -3,11 +3,12 @@ const {
   addContacts, 
   getContactsByYearAndSeason, 
   getContactsByYearSeasonAndLabel,
-  appendContacts,// Import the updateContacts function
+ 
   getUniqueYears,
   getContacts,
   exportContacts,
-  addChildLabel
+  updatelabel,
+  addLabel
 } = require('../controllers/contactController');
 
 const router = express.Router();
@@ -21,12 +22,13 @@ router.get('/:year/:season', getContactsByYearAndSeason);
 // GET route for fetching contacts by year, season, and label
 router.get('/:year/:season/:label', getContactsByYearSeasonAndLabel);
 
-// PUT route for updating contacts and label
-router.put('/update', appendContacts);
+router.put('/update-label', updatelabel);
 
 router.get('/season', getUniqueYears); 
 
 router.get('/allcontacts', getContacts);
+
+router.post('/add-label', addLabel);
 
 router.get('/export', exportContacts);
 
