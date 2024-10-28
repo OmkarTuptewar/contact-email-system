@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext'; // Import your AuthContext
 
 const PdfLabels = ({ onSelectYear, fetchLabels }) => {
+  const { auth } = useContext(AuthContext); // Get auth context
   const [years, setYears] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -9,7 +11,11 @@ const PdfLabels = ({ onSelectYear, fetchLabels }) => {
   useEffect(() => {
     const fetchYears = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/pdf/unique-years`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/pdf/unique-years`, {
+          headers: {
+            Authorization: `Bearer ${auth.token}`, // Add the authorization header directly
+          },
+        });
         setYears(response.data);
       } catch (err) {
         setError(err.message);
@@ -19,7 +25,7 @@ const PdfLabels = ({ onSelectYear, fetchLabels }) => {
     };
 
     fetchYears();
-  }, [fetchLabels]);
+  }, [fetchLabels, auth.token]); // Add auth.token to dependencies
 
   if (loading) return <p>Loading years...</p>;
   if (error) return <p>Error fetching years: {error}</p>;

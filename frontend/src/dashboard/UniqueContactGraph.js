@@ -1,13 +1,15 @@
 // UniqueContactGraph.js
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import LineGraph from './LineGraph';
+import { AuthContext } from '../context/AuthContext'; // Import AuthContext
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const UniqueContactGraph = ({ contactsPerYear }) => {
+  const { auth } = useContext(AuthContext); // Get auth context
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,7 +17,11 @@ const UniqueContactGraph = ({ contactsPerYear }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/dashboard/handlecontacts`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/dashboard/handlecontacts`, {
+          headers: {
+            Authorization: `Bearer ${auth.token}`, // Add authorization header
+          },
+        });
         setData(response.data);
       } catch (err) {
         setError(err.message);
@@ -25,7 +31,7 @@ const UniqueContactGraph = ({ contactsPerYear }) => {
     };
 
     fetchData();
-  }, []);
+  }, [auth.token]); // Add auth.token as a dependency
 
   if (loading) {
     return <div>Loading...</div>;

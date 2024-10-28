@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import * as XLSX from "xlsx"; // Import XLSX for exporting to Excel
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import { AuthContext } from '../context/AuthContext'; // Import AuthContext
 
 const PdfStats = () => {
+  const { auth } = useContext(AuthContext); // Get auth context
   const [pdfData, setPdfData] = useState({
     totalUniqueYears: 0,
     totalLabels: 0,
@@ -17,7 +19,11 @@ const PdfStats = () => {
   useEffect(() => {
     const fetchPdfStats = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/pdf/stats`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/pdf/stats`, {
+          headers: {
+            Authorization: `Bearer ${auth.token}`, // Add authorization header
+          },
+        });
         setPdfData(response.data);
       } catch (error) {
         console.error("Error fetching PDF statistics:", error);
@@ -25,7 +31,7 @@ const PdfStats = () => {
     };
 
     fetchPdfStats();
-  }, []);
+  }, [auth.token]); // Include auth.token as a dependency
 
   const exportToExcel = (pdfs, fileName) => {
     const worksheetData = [];
@@ -78,7 +84,7 @@ const PdfStats = () => {
           onClick={() => exportToExcel(pdfData.totalLinksList, "Total_PDFs")}
           className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-4"
         >
-            <FontAwesomeIcon icon={faDownload} className="mr-2" />
+          <FontAwesomeIcon icon={faDownload} className="mr-2" />
           Export PDFs
         </button>
       </div>
@@ -96,7 +102,7 @@ const PdfStats = () => {
           onClick={() => exportToExcel(pdfData.totalUniqueLinksList, "Unique_PDFs")}
           className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-4"
         >
-            <FontAwesomeIcon icon={faDownload} className="mr-2" />
+          <FontAwesomeIcon icon={faDownload} className="mr-2" />
           Export Unique PDFs
         </button>
       </div>

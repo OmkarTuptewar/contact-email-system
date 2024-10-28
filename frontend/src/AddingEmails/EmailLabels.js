@@ -1,15 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
+import { AuthContext } from "../context/AuthContext"; // Adjust the import path if necessary
 
 const EmailLabels = ({ onSelectYear, onSelectSeason, fetchLabels }) => {
   const [years, setYears] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { auth } = useContext(AuthContext); // Access auth context
 
   useEffect(() => {
     const fetchYears = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/email/season`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/email/season`, {
+          headers: {
+            'Authorization': `Bearer ${auth?.token}`, // Include authorization header
+          },
+        });
         setYears(response.data);
       } catch (err) {
         setError(err.message);
@@ -19,7 +25,7 @@ const EmailLabels = ({ onSelectYear, onSelectSeason, fetchLabels }) => {
     };
 
     fetchYears();
-  }, [fetchLabels]);
+  }, [fetchLabels, auth?.token]); // Include auth.token as a dependency
 
   if (loading) return <p>Loading years...</p>;
   if (error) return <p>Error fetching years: {error}</p>;

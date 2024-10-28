@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
@@ -11,8 +11,10 @@ import ContactsOverview from "./ContactsOverview";
 import DarkMode from "./DarkMode";
 import LinksStats from "./LinkStats";
 import PdfStats from "./PdfStats";
+import { AuthContext } from '../context/AuthContext'; // Import AuthContext
 
 const Dashboard = () => {
+  const { auth } = useContext(AuthContext); // Get auth context
   const [dashboardData, setDashboardData] = useState({
     totalYears: 0,
     totalSpring: 0,
@@ -41,14 +43,17 @@ const Dashboard = () => {
   const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
-  const [pdfdata,setPdfdata]=useState([]);
-
+  const [pdfdata, setPdfdata] = useState([]); // PDF data state
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/dashboard/data`
+          `${process.env.REACT_APP_API_URL}/api/dashboard/data`, {
+            headers: {
+              Authorization: `Bearer ${auth.token}`, // Add authorization header
+            },
+          }
         );
         if (!response.ok) {
           throw new Error("Failed to fetch dashboard data");
@@ -64,7 +69,11 @@ const Dashboard = () => {
     const fetchContacts = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/contacts/allcontacts`
+          `${process.env.REACT_APP_API_URL}/api/contacts/allcontacts`, {
+            headers: {
+              Authorization: `Bearer ${auth.token}`, // Add authorization header
+            },
+          }
         );
         if (!response.ok) {
           throw new Error("Failed to fetch contacts");
@@ -74,15 +83,17 @@ const Dashboard = () => {
       } catch (err) {
         console.error("Error fetching contacts:", err);
         setError(err.message);
-      } finally {
-        setLoading(false);
       }
     };
-    
+
     const fetchEmails = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/email/allemails`
+          `${process.env.REACT_APP_API_URL}/api/email/allemails`, {
+            headers: {
+              Authorization: `Bearer ${auth.token}`, // Add authorization header
+            },
+          }
         );
         if (!response.ok) {
           throw new Error("Failed to fetch Emails");
@@ -92,16 +103,17 @@ const Dashboard = () => {
       } catch (err) {
         console.error("Error fetching Emails:", err);
         setError(err.message);
-      } finally {
-        setLoading(false);
       }
     };
-
 
     const fetchEmailData = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/dashboard/handleEmails`
+          `${process.env.REACT_APP_API_URL}/api/dashboard/handleEmails`, {
+            headers: {
+              Authorization: `Bearer ${auth.token}`, // Add authorization header
+            },
+          }
         );
         if (!response.ok) {
           throw new Error("Failed to fetch email data");
@@ -117,7 +129,11 @@ const Dashboard = () => {
     const fetchPdfData = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/pdf/getpdfs`
+          `${process.env.REACT_APP_API_URL}/api/pdf/getpdfs`, {
+            headers: {
+              Authorization: `Bearer ${auth.token}`, // Add authorization header
+            },
+          }
         );
         if (!response.ok) {
           throw new Error("Failed to fetch pdf data");
@@ -135,7 +151,7 @@ const Dashboard = () => {
     fetchContacts();
     fetchEmailData();
     fetchEmails();
-  }, []);
+  }, [auth.token]); // Include auth.token in the dependency array
 
   if (loading) {
     return <div className="container mx-auto p-4">Loading...</div>;

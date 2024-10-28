@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx'; // Import XLSX for exporting to Excel
 import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { AuthContext } from '../context/AuthContext'; // Import AuthContext
 
 const LinksStats = () => {
     const [linkData, setLinkData] = useState({
@@ -14,11 +15,17 @@ const LinksStats = () => {
         totalUniqueLinksList: [],
     });
 
+    const { auth } = useContext(AuthContext); // Get auth context
+
     // Fetch link statistics
     useEffect(() => {
         const fetchLinkStats = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/link/stats`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/link/stats`, {
+                    headers: {
+                        Authorization: `Bearer ${auth.token}`, // Add authorization header
+                    },
+                });
                 setLinkData(response.data);
             } catch (error) {
                 console.error('Error fetching link statistics:', error);
@@ -26,7 +33,7 @@ const LinksStats = () => {
         };
 
         fetchLinkStats();
-    }, []);
+    }, [auth.token]); // Add auth.token to the dependency array
 
     // Function to export links to Excel
     const exportToExcel = (links, fileName) => {
@@ -98,8 +105,8 @@ const LinksStats = () => {
                 <button
                     onClick={() => exportToExcel(linkData.totalUniqueLinksList, 'Unique_Links')}
                     className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mt-4 transition-colors duration-300 transform hover:scale-105"
-                > 
-                <FontAwesomeIcon icon={faDownload} className="mr-2" />
+                >
+                    <FontAwesomeIcon icon={faDownload} className="mr-2" />
                     Export Unique Links
                 </button>
             </div>

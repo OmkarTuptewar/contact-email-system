@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaEdit, FaSave } from 'react-icons/fa';
+import { AuthContext } from '../context/AuthContext'; // Import your AuthContext
 
 const ContactForm = ({ year, season, selectedLabel, setContacts, fetchLabels }) => {
+  const { auth } = useContext(AuthContext); // Get auth context
   const [label, setLabel] = useState('');
   const [contactList, setContactList] = useState('');
   const [isEditingLabel, setIsEditingLabel] = useState(false);
@@ -35,6 +37,10 @@ const ContactForm = ({ year, season, selectedLabel, setContacts, fetchLabels }) 
         season,
         oldLabel: selectedLabel,
         newLabel: label,
+      }, {
+        headers: {
+          Authorization: `Bearer ${auth.token}`, // Add authorization header
+        },
       });
 
       if (response.status === 200) {
@@ -68,6 +74,10 @@ const ContactForm = ({ year, season, selectedLabel, setContacts, fetchLabels }) 
         season,
         label,
         contacts,
+      }, {
+        headers: {
+          Authorization: `Bearer ${auth.token}`, // Add authorization header
+        },
       });
 
       if (response.status === 200) {

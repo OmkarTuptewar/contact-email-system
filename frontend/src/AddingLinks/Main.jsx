@@ -27,7 +27,11 @@ const Main = () => {
         setLoading(true);
         setError('');
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/link/${selectedYear}/${selectedLabel}/links`);
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/link/${selectedYear}/${selectedLabel}/links`, {
+            headers: {
+              Authorization: `Bearer ${auth.token}`, // Add authorization header
+            },
+          });
           setLinks(response.data); 
         } catch (error) {
           console.error('Error fetching links:', error);
@@ -41,7 +45,7 @@ const Main = () => {
     };
   
     fetchLinks();
-  }, [selectedYear, selectedLabel]);
+  }, [selectedYear, selectedLabel, auth.token]); // Add auth.token to dependency array
   
   const fetchLabels = async () => {
     if (!selectedYear) {
@@ -50,7 +54,11 @@ const Main = () => {
     }
 
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/link/${selectedYear}/labels`);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/link/${selectedYear}/labels`, {
+        headers: {
+          Authorization: `Bearer ${auth.token}`, // Add authorization header
+        },
+      });
       setLabels(response.data); 
     } catch (error) {
       console.error('Error fetching labels:', error);
@@ -64,75 +72,74 @@ const Main = () => {
 
   return (
     <div>
-  <div className="flex items-center justify-between bg-gray-800 h-24 shadow-md p-4 md:p-6 rounded-lg">
-    <Link to="/Contact" className="text-gray-300 hover:text-gray-100 transition-colors">
-      <FontAwesomeIcon icon={faArrowLeft} className="text-2xl" />
-    </Link>
+      <div className="flex items-center justify-between bg-gray-800 h-24 shadow-md p-4 md:p-6 rounded-lg">
+        <Link to="/Contact" className="text-gray-300 hover:text-gray-100 transition-colors">
+          <FontAwesomeIcon icon={faArrowLeft} className="text-2xl" />
+        </Link>
 
-    <h1 className="text-xl md:text-2xl font-bold text-white">
-      LINK MANAGEMENT - KNOWMYSLOTS
-    </h1>
+        <h1 className="text-xl md:text-2xl font-bold text-white">
+          LINK MANAGEMENT - KNOWMYSLOTS
+        </h1>
 
-    <div className="flex flex-col md:flex-row items-center space-x-4">
-      {/* Dropdown Menu */}
-      <Dropdown />
-      {/* Welcome Message */}
-      <p className="text-gray-200 text-lg font-semibold mb-1">
-        Welcome, {auth.username}!
-      </p>
+        <div className="flex flex-col md:flex-row items-center space-x-4">
+          {/* Dropdown Menu */}
+          <Dropdown />
+          {/* Welcome Message */}
+          <p className="text-gray-200 text-lg font-semibold mb-1">
+            Welcome, {auth.username}!
+          </p>
 
-      {/* Logout Button */}
-      <button
-        onClick={logout}
-        className="py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200"
-      >
-        Logout
-      </button>
-    </div>
-  </div>
+          {/* Logout Button */}
+          <button
+            onClick={logout}
+            className="py-2 px-4 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
 
-  <div className="grid grid-cols-1 md:grid-cols-8 gap-4 p-4 h-screen bg-gray-50">
-    <div className="col-span-1 md:col-span-2 bg-white border rounded-lg shadow-md p-6">
-      <h2 className="font-bold text-lg mb-4 text-gray-800">Years</h2>
-      <AddLinkButton onSelectYear={setSelectedYear} />
-      <LinkList selectedYear={selectedYear} />
-      <LinkLabels onSelectYear={setSelectedYear} fetchLabels={fetchLabels} />
-    </div>
+      <div className="grid grid-cols-1 md:grid-cols-8 gap-4 p-4 h-screen bg-gray-50">
+        <div className="col-span-1 md:col-span-2 bg-white border rounded-lg shadow-md p-6">
+          <h2 className="font-bold text-lg mb-4 text-gray-800">Years</h2>
+          <AddLinkButton onSelectYear={setSelectedYear} />
+          <LinkList selectedYear={selectedYear} />
+          <LinkLabels onSelectYear={setSelectedYear} fetchLabels={fetchLabels} />
+        </div>
 
-    <div className="col-span-1 md:col-span-2 bg-gray-200 border rounded-lg shadow-md p-6 overflow-y-auto">
-      <LinkLabelList 
-        year={selectedYear} 
-        onSelectLabel={setSelectedLabel} 
-        labels={labels} 
-        fetchLabels={fetchLabels} 
-      />
-    </div>
+        <div className="col-span-1 md:col-span-2 bg-gray-200 border rounded-lg shadow-md p-6 overflow-y-auto">
+          <LinkLabelList 
+            year={selectedYear} 
+            onSelectLabel={setSelectedLabel} 
+            labels={labels} 
+            fetchLabels={fetchLabels} 
+          />
+        </div>
 
-    <div className="col-span-1 md:col-span-4 bg-white border rounded-lg shadow-md p-6 flex flex-col">
-      <h2 className="font-bold text-lg mb-4 text-gray-800">Links</h2>
-      <LinkForm 
-        year={selectedYear} 
-        selectedLabel={selectedLabel} 
-        setLinks={setLinks} 
-        fetchLabels={fetchLabels} 
-        updateSelectedLabel={updateSelectedLabel} // Pass the update function
-      />
+        <div className="col-span-1 md:col-span-4 bg-white border rounded-lg shadow-md p-6 flex flex-col">
+          <h2 className="font-bold text-lg mb-4 text-gray-800">Links</h2>
+          <LinkForm 
+            year={selectedYear} 
+            selectedLabel={selectedLabel} 
+            setLinks={setLinks} 
+            fetchLabels={fetchLabels} 
+            updateSelectedLabel={updateSelectedLabel} // Pass the update function
+          />
 
-      {auth.role === 'admin' && (
-        <div className="mt-4">
-          {loading ? (
-            <p className="text-gray-600">Loading links...</p>
-          ) : error ? (
-            <p className="text-red-600">{error}</p>
-          ) : (
-            <LinkTable links={links} />
+          {auth.role === 'admin' && (
+            <div className="mt-4">
+              {loading ? (
+                <p className="text-gray-600">Loading links...</p>
+              ) : error ? (
+                <p className="text-red-600">{error}</p>
+              ) : (
+                <LinkTable links={links} />
+              )}
+            </div>
           )}
         </div>
-      )}
+      </div>
     </div>
-  </div>
-</div>
-
   );
 };
 

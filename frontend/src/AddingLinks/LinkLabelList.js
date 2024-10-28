@@ -1,57 +1,55 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { toast } from 'react-toastify'; 
+import { AuthContext } from '../context/AuthContext'; // Import AuthContext
+
 const Modal = ({ isOpen, onClose, onSubmit, year }) => {
   const [newLabel, setNewLabel] = useState("");
+  const { auth } = useContext(AuthContext); // Access auth token from context
 
- 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (newLabel) {
+      try {
+        const requestBody = {
+          year,
+          label: newLabel,
+          links: [], // Initialize with an empty links array
+        };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  if (newLabel) {
-    try {
-      const requestBody = {
-        year,
-        label: newLabel,
-        links: [], // Initialize with an empty links array
-      };
-      
-      // Send the request to add a new label
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/link/add-labels`,
-        requestBody
-      );
+        const response = await axios.post(
+          `${process.env.REACT_APP_API_URL}/api/link/add-labels`,
+          requestBody,
+          {
+            headers: {
+              Authorization: `Bearer ${auth.token}`, // Include Authorization header
+            },
+          }
+        );
 
-      // Handle both 200 and 201 as success
-      if (response.status === 200 || response.status === 201) {
-        onSubmit(newLabel); // Call the onSubmit function with the new label
-        setNewLabel(""); // Clear the input field
-        onClose(); // Close the modal
-
-        // Show a success toast notification
-        toast.success('Label added successfully!');
-      } else {
-        console.error("Unexpected response:", response);
-        toast.error('Unexpected response from the server.');
+        if (response.status === 200 || response.status === 201) {
+          onSubmit(newLabel); // Call the onSubmit function with the new label
+          setNewLabel(""); // Clear the input field
+          onClose(); // Close the modal
+          toast.success('Label added successfully!');
+        } else {
+          console.error("Unexpected response:", response);
+          toast.error('Unexpected response from the server.');
+        }
+      } catch (error) {
+        console.error(
+          "Error adding label:",
+          error.response ? error.response.data : error.message
+        );
+        toast.error(
+          error.response ? error.response.data.message : 'Error adding label.'
+        );
       }
-    } catch (error) {
-      console.error(
-        "Error adding label:",
-        error.response ? error.response.data : error.message
-      );
-
-      // Show an error toast notification
-      toast.error(
-        error.response ? error.response.data.message : 'Error adding label.'
-      );
+    } else {
+      toast.warning('Please enter a label.');
     }
-  } else {
-    toast.warning('Please enter a label.'); // Notify user if no label is provided
-  }
-};
+  };
 
-
-  // Return null if the modal is not open
   if (!isOpen) return null;
 
   return (
@@ -89,39 +87,39 @@ const handleSubmit = async (e) => {
   );
 };
 
-// Main LinkLabelList component
 const LinkLabelList = ({ year, onSelectLabel, fetchLabels }) => {
   const [labels, setLabels] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { auth } = useContext(AuthContext); // Get auth token from context
 
-  // Fetch labels for the given year
   useEffect(() => {
     if (year) {
       axios
-        .get(`${process.env.REACT_APP_API_URL}/api/link/${year}/labels`)
+        .get(`${process.env.REACT_APP_API_URL}/api/link/${year}/labels`, {
+          headers: {
+            Authorization: `Bearer ${auth.token}`, // Add auth header
+          },
+        })
         .then((response) => {
-          console.log("Fetched labels:", response.data); // Log fetched labels to inspect structure
+          console.log("Fetched labels:", response.data);
           setLabels(response.data);
         })
         .catch((err) => console.log(err));
     }
-  }, [year, fetchLabels]);
+  }, [year, fetchLabels, auth.token]);
 
-  // Handle label click to select the label
   const handleLabelClick = (label) => {
     console.log("Label clicked:", label.label);
-    onSelectLabel(label.label); // Pass the selected label to the parent component
+    onSelectLabel(label.label);
   };
 
-  // Add a new label to the list
   const handleAddLabel = (newLabel) => {
-    // Create the new label object
     const newLabelObj = {
       name: newLabel,
-      label: newLabel, // Ensure this matches the structure from the backend
+      label: newLabel,
       links: [],
     };
-    setLabels((prevLabels) => [...prevLabels, newLabelObj]); // Add new label to state
+    setLabels((prevLabels) => [...prevLabels, newLabelObj]);
   };
 
   return (
@@ -142,14 +140,13 @@ const LinkLabelList = ({ year, onSelectLabel, fetchLabels }) => {
             <li
               key={idx}
               className="cursor-pointer mb-2 p-3 border border-gray-300 rounded-lg transition duration-300 ease-in-out 
-        transform hover:bg-blue-200 hover:shadow-xl hover:scale-105 active:scale-95 
-        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 
-        text-sm md:text-base lg:text-lg"
-              onClick={() => handleLabelClick(labelObj)} // Pass the object
+              transform hover:bg-blue-200 hover:shadow-xl hover:scale-105 active:scale-95 
+              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 
+              text-sm md:text-base lg:text-lg"
+              onClick={() => handleLabelClick(labelObj)}
             >
               <span className="text-blue-600 font-medium truncate block">
-                {labelObj.label|| "Unnamed Labellll"}
-                {/* Ensure we fall back to 'name' if 'label' is missing */}
+                {labelObj.label || "Unnamed Label"}
               </span>
             </li>
           ))}
@@ -166,4 +163,3 @@ const LinkLabelList = ({ year, onSelectLabel, fetchLabels }) => {
 };
 
 export default LinkLabelList;
-  

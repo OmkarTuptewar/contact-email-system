@@ -1,44 +1,47 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { toast } from 'react-toastify';
+import { AuthContext } from "../context/AuthContext"; // Import AuthContext
 
 const Modal = ({ isOpen, onClose, onSubmit, year, season, contacts }) => {
   const [newLabel, setNewLabel] = useState("");
+  const { auth } = useContext(AuthContext); // Access auth context for token
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (newLabel) {
       try {
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/contacts/add-label`, {
-          label: newLabel,
-          year,
-          season,
-          contacts,
-        });
-  
+        const response = await axios.post(
+          `${process.env.REACT_APP_API_URL}/api/contacts/add-label`,
+          { label: newLabel, year, season, contacts },
+          {
+            headers: {
+              'Authorization': `Bearer ${auth?.token}`, // Include token in headers
+            }
+          }
+        );
+
         if (response.status === 201) {
-          toast.success("Label added successfully!"); // Success toast
-          onSubmit(newLabel); 
-          setNewLabel(""); 
-          onClose(); 
+          toast.success("Label added successfully!");
+          onSubmit(newLabel);
+          setNewLabel("");
+          onClose();
         } else {
           console.error("Unexpected response:", response);
-          toast.error("Unexpected response from the server."); // Error toast
+          toast.error("Unexpected response from the server.");
         }
       } catch (error) {
         console.error("Error adding label:", error);
-        
-        // Check if error response exists and extract message
         const errorMessage = error.response?.data?.message || "Error adding label. Please try again.";
-        toast.error(errorMessage); // Error toast with server message or fallback
+        toast.error(errorMessage);
       }
     } else {
-      toast.warn("Please enter a label."); // Warning toast for empty label
+      toast.warn("Please enter a label.");
     }
   };
-  
-  if (!isOpen) return null; 
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -71,27 +74,40 @@ const Modal = ({ isOpen, onClose, onSubmit, year, season, contacts }) => {
 const LabelList = ({ year, season, onSelectLabel, fetchLabels }) => {
   const [labels, setLabels] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const contacts = []; 
+  const { auth } = useContext(AuthContext);
+  const contacts = [];
 
   useEffect(() => {
-    if (year && season) {
-      axios
-        .get(`${process.env.REACT_APP_API_URL}/api/contacts/${year}/${season}`)
-        .then((response) => setLabels(response.data))
-        .catch((err) => console.log(err));
+   
+    if (year && season && auth?.token) {
+      const fetchLabelsData = async () => {
+        try {
+          const response = await axios.get(
+            `${process.env.REACT_APP_API_URL}/api/contacts/${year}/${season}`,
+            {
+              headers: {
+                'Authorization': `Bearer ${auth.token}`,
+              },
+            }
+          );
+          setLabels(response.data);
+        } catch (error) {
+          console.log("Error fetching labels:", error);
+        }
+      };
+
+      fetchLabelsData();
     }
-  }, [year, season, fetchLabels]);
+  }, [year, season, fetchLabels, auth?.token]);
 
   const handleLabelClick = (label) => {
-    console.log("Label clicked:", label.label);
     onSelectLabel(label.label);
   };
 
   const handleAddLabel = (newLabel) => {
-   
     setLabels((prevLabels) => [
       ...prevLabels,
-      { name: newLabel, label: newLabel }, 
+      { name: newLabel, label: newLabel },
     ]);
   };
 
@@ -101,22 +117,22 @@ const LabelList = ({ year, season, onSelectLabel, fetchLabels }) => {
         Labels
         <button
           onClick={() => setIsModalOpen(true)}
-          className="ml-44 bg-blue-500 text-white p-1 px-4 rounded-full" 
+          className="ml-44 bg-blue-500 text-white p-1 px-4 rounded-full"
           title="Add new label"
         >
           +
         </button>
       </h3>
-      <div className="flex justify-between items-center ">
-        <div className="rounded-lg  p-2  w-full  max-h-[45vh] ">
+      <div className="flex justify-between items-center">
+        <div className="rounded-lg p-2 w-full max-h-[45vh]">
           <h4 className="font-semibold text-xl text-gray-600 mb-4">{season}</h4>
-          <ul className="space-y-2 ">
+          <ul className="space-y-2">
             {labels.map((label, idx) => (
               <li
                 key={idx}
-                className="cursor-pointer mb-2 p-3 border border-gray-300 rounded-lg transition duration-300 ease-in-out 
-                  transform hover:bg-blue-200 hover:shadow-xl hover:scale-105 active:scale-95 
-                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 
+                className="cursor-pointer mb-2 p-3 border border-gray-300 rounded-lg transition duration-300 ease-in-out
+                  transform hover:bg-blue-200 hover:shadow-xl hover:scale-105 active:scale-95
+                  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
                   text-sm md:text-base lg:text-lg"
                 onClick={() => handleLabelClick(label)}
               >
@@ -128,13 +144,13 @@ const LabelList = ({ year, season, onSelectLabel, fetchLabels }) => {
           </ul>
         </div>
       </div>
-      <Modal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onSubmit={handleAddLabel} 
-        year={year} 
-        season={season} 
-        contacts={contacts} 
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleAddLabel}
+        year={year}
+        season={season}
+        contacts={contacts}
       />
     </>
   );

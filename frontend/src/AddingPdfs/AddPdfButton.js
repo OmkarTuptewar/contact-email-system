@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import axios from 'axios'; // Import axios for making HTTP requests
-import { toast, ToastContainer } from 'react-toastify'; // Import toast for notifications
-import 'react-toastify/dist/ReactToastify.css'; // Import the CSS for toast notifications
+import React, { useState, useContext } from 'react';
+import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { AuthContext } from '../context/AuthContext'; // Import your AuthContext
 
 const AddPdfButton = ({ onSelectYear }) => {
+  const { auth } = useContext(AuthContext); // Access the auth context
   const [year, setYear] = useState('');
 
   const handleAddYear = async () => {
@@ -16,11 +18,14 @@ const AddPdfButton = ({ onSelectYear }) => {
     try {
       // Log the year to be sent
       console.log("Sending year:", year);
-  
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/pdf/add-year`, {
-        year: parseInt(year), // Convert year to an integer
-      });
-  
+
+      // Send the POST request with auth headers directly in the request
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/pdf/add-year`, 
+        { year: parseInt(year) }, // Data to send
+        { headers: { Authorization: `Bearer ${auth.token}` } } // Auth headers directly
+      );
+
       // Check for successful response
       if (response.status === 201) { // Check for the status code for created
         onSelectYear(year); // Call the onSelectYear function to update the year
@@ -58,7 +63,7 @@ const AddPdfButton = ({ onSelectYear }) => {
       >
         Add Year
       </button>
-       
+      <ToastContainer /> {/* Include ToastContainer for notifications */}
     </div>
   );
 };

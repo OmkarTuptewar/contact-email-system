@@ -3,8 +3,11 @@ import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaEdit, FaSave } from 'react-icons/fa';
 import 'react-toastify/dist/ReactToastify.css';
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext'; // Import your AuthContext
 
 const PdfForm = ({ year, selectedLabel, setPdfs, fetchLabels, updateSelectedLabel }) => {
+    const { auth } = useContext(AuthContext); // Get auth context
     const [file, setFile] = useState(null); // Single file state
     const [description, setDescription] = useState(''); // Single description state
     const [loading, setLoading] = useState(false);
@@ -19,7 +22,7 @@ const PdfForm = ({ year, selectedLabel, setPdfs, fetchLabels, updateSelectedLabe
     const handleFileChange = (e) => {
         setFile(e.target.files[0]); // Save the single file
     };
-
+    
     const handleUpdatePdf = async () => {
         const numericYear = parseInt(year);
 
@@ -42,6 +45,7 @@ const PdfForm = ({ year, selectedLabel, setPdfs, fetchLabels, updateSelectedLabe
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/pdf/append-pdfs`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${auth.token}`, // Add the authorization header directly
                 },
             });
 
@@ -84,6 +88,10 @@ const PdfForm = ({ year, selectedLabel, setPdfs, fetchLabels, updateSelectedLabe
                 year,
                 oldLabel: selectedLabel, // The current label before update
                 newLabel: label, // The updated label
+            }, {
+                headers: {
+                    Authorization: `Bearer ${auth.token}`, // Add the authorization header directly
+                },
             });
 
             if (response.status === 200) {
@@ -99,7 +107,6 @@ const PdfForm = ({ year, selectedLabel, setPdfs, fetchLabels, updateSelectedLabe
             toast.error('Error updating label. Please try again.');
         } finally {
             setLoading(false);
-          
         }
     };
 

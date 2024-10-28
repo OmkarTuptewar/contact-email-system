@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { AuthContext } from '../context/AuthContext'; // Import your AuthContext
 
 const Modal = ({ isOpen, onClose, onSubmit, year }) => {
+  const { auth } = useContext(AuthContext); // Get auth context
   const [newLabel, setNewLabel] = useState("");
 
   const handleSubmit = async (e) => {
@@ -18,7 +20,12 @@ const Modal = ({ isOpen, onClose, onSubmit, year }) => {
   
         const response = await axios.post(
           `${process.env.REACT_APP_API_URL}/api/pdf/add-labels`,
-          requestBody
+          requestBody,
+          {
+            headers: {
+              Authorization: `Bearer ${auth.token}`, // Add the authorization header
+            },
+          }
         );
   
         if (response.status === 200 || response.status === 201) {
@@ -31,7 +38,6 @@ const Modal = ({ isOpen, onClose, onSubmit, year }) => {
         }
       } catch (error) {
         if (error.response) {
-          // Accessing error response details
           const message = error.response.data?.message || 'Error adding label. Please try again.';
           toast.error(message);
         } else {
@@ -81,6 +87,7 @@ const Modal = ({ isOpen, onClose, onSubmit, year }) => {
 };
 
 const PdfLabelList = ({ year, onSelectLabel, fetchLabels }) => {
+  const { auth } = useContext(AuthContext); // Get auth context
   const [labels, setLabels] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -89,7 +96,11 @@ const PdfLabelList = ({ year, onSelectLabel, fetchLabels }) => {
     const fetchLabelsData = async () => {
       if (year) {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/pdf/${year}/labels`);
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/pdf/${year}/labels`, {
+            headers: {
+              Authorization: `Bearer ${auth.token}`, // Add the authorization header
+            },
+          });
           console.log("Fetched labels:", response.data);
           setLabels(response.data);
         } catch (err) {
@@ -102,7 +113,7 @@ const PdfLabelList = ({ year, onSelectLabel, fetchLabels }) => {
     };
 
     fetchLabelsData();
-  }, [year, fetchLabels]);
+  }, [year, fetchLabels, auth.token]); // Added auth.token to dependencies
 
   const handleLabelClick = (label) => {
     console.log("Label clicked:", label.label);
@@ -131,24 +142,24 @@ const PdfLabelList = ({ year, onSelectLabel, fetchLabels }) => {
         </button>
       </h3>
      
-        <div className="rounded-lg p-2 shadow-md w-full ">
-          <ul className="space-y-2">
-            {labels.map((labelObj, idx) => (
-              <li
-                key={labelObj.id || idx}
-                className="cursor-pointer mb-2 p-3 border border-gray-300 rounded-lg transition duration-300 ease-in-out 
-                transform hover:bg-blue-200 hover:shadow-xl hover:scale-105 active:scale-95 
-                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 
-                text-sm md:text-base lg:text-lg"
-                onClick={() => handleLabelClick(labelObj)}
-              >
-                <span className="text-blue-600 font-medium truncate block">
-                  {labelObj.label || labelObj.name || "Unnamed Label"}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className="rounded-lg p-2 shadow-md w-full ">
+        <ul className="space-y-2">
+          {labels.map((labelObj, idx) => (
+            <li
+              key={labelObj.id || idx}
+              className="cursor-pointer mb-2 p-3 border border-gray-300 rounded-lg transition duration-300 ease-in-out 
+              transform hover:bg-blue-200 hover:shadow-xl hover:scale-105 active:scale-95 
+              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 
+              text-sm md:text-base lg:text-lg"
+              onClick={() => handleLabelClick(labelObj)}
+            >
+              <span className="text-blue-600 font-medium truncate block">
+                {labelObj.label || labelObj.name || "Unnamed Label"}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
      
       <Modal
         isOpen={isModalOpen}
@@ -156,7 +167,6 @@ const PdfLabelList = ({ year, onSelectLabel, fetchLabels }) => {
         onSubmit={handleAddLabel}
         year={year}
       />
-  
     </>
   );
 };

@@ -44,6 +44,9 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
    
       const { token } = data; 
+
+
+      
       const decodedToken = jwtDecode(token); 
       
   
@@ -54,6 +57,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated: true,
         role: role === 'staff' ? 'guest' : 'admin', 
         username: username, 
+        token :token,
       });
   
       setError(null);
@@ -74,7 +78,9 @@ export const AuthProvider = ({ children }) => {
       isAuthenticated: false,
       role: null,
       username: null,
+      token:null
     });
+    localStorage.removeItem('auth');
     navigate('/'); // Redirect to login page
   };
 

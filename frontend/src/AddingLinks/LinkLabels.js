@@ -1,15 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext'; // Import your AuthContext
 
 const LinkLabels = ({ onSelectYear, fetchLabels }) => {
   const [years, setYears] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { auth } = useContext(AuthContext); // Get auth from context
 
   useEffect(() => {
     const fetchYears = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/link/unique-years`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/link/unique-years`, {
+          headers: {
+            Authorization: `Bearer ${auth.token}`, // Include the authorization header
+          },
+        });
         setYears(response.data);
       } catch (err) {
         setError(err.message);
@@ -19,7 +25,7 @@ const LinkLabels = ({ onSelectYear, fetchLabels }) => {
     };
 
     fetchYears();
-  }, [fetchLabels]);
+  }, [fetchLabels, auth.token]); // Add auth.token to dependency array
 
   if (loading) return <p>Loading years...</p>;
   if (error) return <p>Error fetching years: {error}</p>;

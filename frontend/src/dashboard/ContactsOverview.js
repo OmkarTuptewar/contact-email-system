@@ -1,9 +1,9 @@
-// components/ContactsOverview.js
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import ExportOnlyContacts from "./ExportOnlyContacts"; // Import your export component
+import { AuthContext } from '../context/AuthContext'; // Import your AuthContext
 
 const ContactsOverview = ({ labelsPerYear }) => {
+  const { auth } = useContext(AuthContext); // Get auth context
   const [contactsPerYear, setContactsPerYear] = useState({});
   const [error, setError] = useState(null); // State for error handling
   const [loading, setLoading] = useState(true); // State for loading
@@ -11,7 +11,11 @@ const ContactsOverview = ({ labelsPerYear }) => {
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/dashboard/contactlist`);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/dashboard/contactlist`, {
+          headers: {
+            Authorization: `Bearer ${auth.token}`, // Add authorization header
+          },
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch contacts");
         }
@@ -28,7 +32,7 @@ const ContactsOverview = ({ labelsPerYear }) => {
     };
 
     fetchContacts();
-  }, []);
+  }, [auth.token]); // Include auth.token in the dependency array
 
   if (loading) {
     return (

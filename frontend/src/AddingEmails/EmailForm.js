@@ -1,18 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaEdit, FaSave } from 'react-icons/fa';
+import { AuthContext } from "../context/AuthContext"; // Make sure this path is correct
 
 const EmailForm = ({ year, season, selectedLabel, setEmails, fetchLabels }) => {
     const [label, setLabel] = useState('');
     const [emailList, setEmailList] = useState('');
     const [isEditingLabel, setIsEditingLabel] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const { auth } = useContext(AuthContext); // Get auth context
 
     useEffect(() => {
         if (selectedLabel) {
-            setLabel(selectedLabel); // Adapted for selectedLabel
+            setLabel(selectedLabel); // Set label if selectedLabel exists
         } else {
             setLabel('');
         }
@@ -30,12 +32,20 @@ const EmailForm = ({ year, season, selectedLabel, setEmails, fetchLabels }) => {
 
         setIsLoading(true);
         try {
-            const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/email/update-label`, {
-                year,
-                season,
-                oldLabel: selectedLabel,
-                newLabel: label,
-            });
+            const response = await axios.put(
+                `${process.env.REACT_APP_API_URL}/api/email/update-label`,
+                {
+                    year,
+                    season,
+                    oldLabel: selectedLabel,
+                    newLabel: label,
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${auth?.token}`, // Include token
+                    },
+                }
+            );
 
             if (response.status === 200) {
                 setIsEditingLabel(false);
@@ -63,12 +73,20 @@ const EmailForm = ({ year, season, selectedLabel, setEmails, fetchLabels }) => {
 
         setIsLoading(true);
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/email/add`, {
-                year,
-                season,
-                label,
-                emails,
-            });
+            const response = await axios.post(
+                `${process.env.REACT_APP_API_URL}/api/email/add`,
+                {
+                    year,
+                    season,
+                    label,
+                    emails,
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${auth?.token}`, // Include token
+                    },
+                }
+            );
 
             if (response.status === 200) {
                 setEmails(response.data.emails);

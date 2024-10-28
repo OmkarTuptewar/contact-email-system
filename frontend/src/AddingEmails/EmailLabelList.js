@@ -1,49 +1,49 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import { toast } from 'react-toastify';
+import { AuthContext } from "../context/AuthContext";
 
 const Modal = ({ isOpen, onClose, onSubmit, year, season }) => {
   const [newLabel, setNewLabel] = useState("");
-
- 
+  const { auth } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (newLabel) {
-      try {
-        const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/email/add-label`, {
+    if (!newLabel.trim()) {
+      toast.error("Label name cannot be empty.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/email/add-label`, {
           year,
           season,
           label: newLabel,
-          emails: [], 
+          emails: [],
+        }, {
+          headers: {
+              'Authorization': `Bearer ${auth?.token}`,
+          },
         });
-  
-        if (response.status === 201) {
-          onSubmit(newLabel); 
-          setNewLabel(""); 
-          onClose();
-          
-          // Show success toast
-          toast.success("Label added successfully!");
-        } else {
-          console.error("Unexpected response:", response);
-          // Show generic error toast
-          toast.error("Something went wrong. Please try again.");
-        }
-      } catch (error) {
-        console.error("Error adding label:", error);
-        // Show error toast with error message
-        toast.error("Error adding label: " + (error.response?.data?.message || "Please try again later."));
+
+      if (response.status === 201) {
+        onSubmit(newLabel);
+        setNewLabel("");
+        onClose();
+        toast.success("Label added successfully!");
+      } else {
+        toast.error("Something went wrong. Please try again.");
       }
+    } catch (error) {
+      toast.error("Error adding label: " + (error.response?.data?.message || "Please try again later."));
     }
   };
-  
 
-  if (!isOpen) return null; 
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="fixed inset-0 bg-black opacity-50"></div>
+      <div className="fixed inset-0 bg-black opacity-50" onClick={onClose}></div>
       <div className="bg-white p-4 rounded shadow-lg z-10">
         <h2 className="font-bold text-lg mb-4">Add New Label</h2>
         <form onSubmit={handleSubmit}>
@@ -72,23 +72,29 @@ const Modal = ({ isOpen, onClose, onSubmit, year, season }) => {
 const EmailLabelList = ({ year, season, onSelectLabel, fetchLabels }) => {
   const [labels, setLabels] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { auth } = useContext(AuthContext); // Access auth context
 
   useEffect(() => {
     if (year && season) {
       axios
-        .get(`${process.env.REACT_APP_API_URL}/api/email/${year}/${season}`)
+        .get(`${process.env.REACT_APP_API_URL}/api/email/${year}/${season}`, {
+          headers: {
+            'Authorization': `Bearer ${auth?.token}`, // Include authorization header
+          },
+        })
         .then((response) => setLabels(response.data))
-        .catch((err) => console.log(err));
+        .catch((err) => {
+          console.log(err);
+          toast.error("Error fetching labels: " + (err.response?.data?.message || "Please try again later."));
+        });
     }
-  }, [year, season, fetchLabels]);
+  }, [year, season, fetchLabels, auth?.token]); // Include auth.token as a dependency
 
   const handleLabelClick = (label) => {
-    console.log('Label clicked:', label.label);
-    onSelectLabel(label.label); 
+    onSelectLabel(label.label);
   };
 
   const handleAddLabel = (newLabel) => {
-
     setLabels((prevLabels) => [
       ...prevLabels,
       { name: newLabel, label: newLabel, emails: [] },
@@ -107,7 +113,7 @@ const EmailLabelList = ({ year, season, onSelectLabel, fetchLabels }) => {
           +
         </button>
       </h3>
-      <div className="rounded-lg p-2 shadow-md w-full ">
+      <div className="rounded-lg p-2 shadow-md w-full">
         <h4 className="font-semibold text-xl text-gray-600 mb-4">{season}</h4>
         <ul className="space-y-2">
           {labels.map((label, idx) => (

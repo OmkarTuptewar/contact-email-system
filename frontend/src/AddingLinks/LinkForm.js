@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import { FaEdit, FaSave } from 'react-icons/fa';
 import 'react-toastify/dist/ReactToastify.css';
+import { AuthContext } from '../context/AuthContext'; // Import your AuthContext
 
 const LinkForm = ({ year, selectedLabel, setLinks, fetchLabels, updateSelectedLabel }) => {
     const [linkList, setLinkList] = useState('');
@@ -10,6 +11,7 @@ const LinkForm = ({ year, selectedLabel, setLinks, fetchLabels, updateSelectedLa
     const [isEditingLabel, setIsEditingLabel] = useState(false);
     const [label, setLabel] = useState(selectedLabel);
     const [tempLabel, setTempLabel] = useState(selectedLabel); // Temporary state for the label
+    const { auth } = useContext(AuthContext); // Get auth from context
 
     useEffect(() => {
         setLabel(selectedLabel); // Update label when selectedLabel changes
@@ -28,11 +30,19 @@ const LinkForm = ({ year, selectedLabel, setLinks, fetchLabels, updateSelectedLa
         setLoading(true);
 
         try {
-            const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/link/append-links`, {
-                year: numericYear,
-                label, // Use current label
-                newLinks: updatedLinks,
-            });
+            const response = await axios.put(
+                `${process.env.REACT_APP_API_URL}/api/link/append-links`,
+                {
+                    year: numericYear,
+                    label, // Use current label
+                    newLinks: updatedLinks,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${auth.token}`, // Include the authorization header
+                    },
+                }
+            );
 
             setLinks(response.data.Links); // Update state with the appended links
             setLinkList(''); // Clear the input
@@ -55,16 +65,24 @@ const LinkForm = ({ year, selectedLabel, setLinks, fetchLabels, updateSelectedLa
             toast.error('Label name cannot be empty.');
             return;
         }
-    
+
         setLoading(true);
-    
+
         try {
-            const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/link/update-label`, {
-                year,
-                oldLabel: label, // The current label before update
-                newLabel: tempLabel, // The updated label
-            });
-    
+            const response = await axios.put(
+                `${process.env.REACT_APP_API_URL}/api/link/update-label`,
+                {
+                    year,
+                    oldLabel: label, // The current label before update
+                    newLabel: tempLabel, // The updated label
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${auth.token}`, // Include the authorization header
+                    },
+                }
+            );
+
             if (response.status === 200) {
                 setLabel(tempLabel); // Update the main label state
                 fetchLabels(); // Refresh labels list after update
@@ -82,7 +100,7 @@ const LinkForm = ({ year, selectedLabel, setLinks, fetchLabels, updateSelectedLa
             setIsEditingLabel(false); // Exit edit mode
         }
     };
-    
+
     return (
         <div>
             <h3 className="font-bold text-lg mb-4 text-gray-800">
@@ -92,11 +110,11 @@ const LinkForm = ({ year, selectedLabel, setLinks, fetchLabels, updateSelectedLa
                         <input
                             type="text"
                             className="border p-1 rounded"
-                            value={tempLabel} 
-                            onChange={(e) => setTempLabel(e.target.value)} 
+                            value={tempLabel}
+                            onChange={(e) => setTempLabel(e.target.value)}
                         />
                     ) : (
-                        label 
+                        label
                     )}
                 </span>
                 {isEditingLabel ? (
@@ -122,7 +140,7 @@ const LinkForm = ({ year, selectedLabel, setLinks, fetchLabels, updateSelectedLa
             <button
                 className="px-4 py-2 rounded text-white bg-red-500"
                 onClick={handleUpdateLink}
-                disabled={loading} 
+                disabled={loading}
             >
                 Append Link
             </button>
