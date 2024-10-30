@@ -9,6 +9,7 @@ import LabelList from './components/LabelList';
 import ContactForm from './components/ContactForm';
 import ContactTable from './components/ContactTable';
 import YearLabels from './components/YearLabels';
+import { ToastContainer } from 'react-toastify';
 
 const App = () => {
   const { auth, logout } = useContext(AuthContext);
@@ -20,14 +21,14 @@ const App = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Fetch contacts when year, season, or label changes
+
   useEffect(() => {
     if (selectedYear && selectedSeason && selectedLabel) {
       setLoading(true);
       setError('');
       axios.get(`${process.env.REACT_APP_API_URL}/api/contacts/${selectedYear}/${selectedSeason}/${selectedLabel}`, {
         headers: {
-          Authorization: `Bearer ${auth.token}`, // Add authorization header
+          Authorization: `Bearer ${auth.token}`,
         },
       })
         .then((response) => {
@@ -42,34 +43,35 @@ const App = () => {
           setLoading(false);
         });
     }
-  }, [selectedYear, selectedSeason, selectedLabel, auth.token]); // Add auth.token as a dependency
+  }, [selectedYear, selectedSeason, selectedLabel, auth.token]); 
 
-  // Fetch labels based on selected year and season
+ 
   const fetchLabels = async () => {
     if (!selectedYear || !selectedSeason) {
-      setLabels([]); // Set labels to an empty array if year or season is not selected
+      setLabels([]); 
       return;
     }
 
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/contacts/${selectedYear}/${selectedSeason}`, {
         headers: {
-          Authorization: `Bearer ${auth.token}`, // Add authorization header
+          Authorization: `Bearer ${auth.token}`,
         },
       });
-      setLabels(response.data); // Set the labels in the state
+      setLabels(response.data); 
     } catch (error) {
       console.error('Error fetching labels:', error);
     }
   };
 
-  // Call fetchLabels whenever year or season changes
+
   useEffect(() => {
-    fetchLabels(); // Fetch labels whenever selectedYear or selectedSeason changes
-  }, [selectedYear, selectedSeason, auth.token]); // Add auth.token as a dependency
+    fetchLabels();
+  }, [selectedYear, selectedSeason, auth.token]); 
 
   return (
     <div className="min-h-screen bg-gray-200">
+      <ToastContainer/>
       {/* Header Section */}
       <div className="flex items-center justify-between bg-gray-800 h-24 shadow-lg p-4 md:p-6 rounded-lg">
         <h1 className="text-xl md:text-2xl font-bold text-white">

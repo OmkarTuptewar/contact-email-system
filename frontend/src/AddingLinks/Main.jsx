@@ -11,6 +11,7 @@ import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import Dropdown from '../components/Dropdown';
+import { ToastContainer } from 'react-toastify';
 
 const Main = () => {
   const { auth, logout } = useContext(AuthContext);
@@ -72,6 +73,7 @@ const Main = () => {
 
   return (
     <div>
+      <ToastContainer/>
       <div className="flex items-center justify-between bg-gray-800 h-24 shadow-md p-4 md:p-6 rounded-lg">
         <Link to="/Contact" className="text-gray-300 hover:text-gray-100 transition-colors">
           <FontAwesomeIcon icon={faArrowLeft} className="text-2xl" />

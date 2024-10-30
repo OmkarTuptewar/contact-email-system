@@ -140,7 +140,7 @@ const EmailForm = ({ year, season, selectedLabel, setEmails, fetchLabels }) => {
                 {isLoading ? 'Processing...' : 'Add Email'}
             </button>
 
-            <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick pauseOnHover draggable />
+            
         </div>
     );
 };

@@ -165,7 +165,7 @@ const PdfForm = ({ year, selectedLabel, setPdfs, fetchLabels, updateSelectedLabe
                 {loading ? 'Uploading...' : 'Upload PDF'}
             </button>
 
-            <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick pauseOnHover draggable />
+            
         </div>
     );
 };

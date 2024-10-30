@@ -145,7 +145,7 @@ const LinkForm = ({ year, selectedLabel, setLinks, fetchLabels, updateSelectedLa
                 Append Link
             </button>
 
-            <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick pauseOnHover draggable />
+          
         </div>
     );
 };

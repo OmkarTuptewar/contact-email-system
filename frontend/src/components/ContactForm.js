@@ -132,7 +132,7 @@ const ContactForm = ({ year, season, selectedLabel, setContacts, fetchLabels }) 
         {isLoading ? 'Processing...' : 'Add Contact'}
       </button>
 
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick pauseOnHover draggable />
+     
     </div>
   );
 };
